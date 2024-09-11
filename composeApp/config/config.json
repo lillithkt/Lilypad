@@ -1,0 +1,38 @@
+{
+    "core": {
+        "headless": false,
+        "listen": 9001,
+        "connect": "localhost:9000",
+        "Module Packages Explanation": "A list of packages to scan for modules. Core modules are hardcoded into the resolver, and do not need to be added here.",
+        "modulePackages": [
+            "gay.lilyy.lilypad.core.modules.modules"
+        ],
+        "logs": {
+            "incomingData": false,
+            "outgoingData": false,
+            "outgoingChatbox": false,
+            "errors": true
+        }
+    },
+    "modules": {
+        "spotify": {
+            "enabled": false,
+            "lyrics": {
+                "enabled": true,
+                "Provider Explanation": "The provider to use for lyrics. This is an instance of https://github.com/imlvna/spotify-lyrics-api",
+                "provider": "https://spotify-lyrics-api.lvna.workers.dev"
+            },
+            "auth": {
+                "clientId": "",
+                "clientSecret": "",
+                "redirectUri": "",
+                "refreshToken": ""
+            },
+            "nonAuth": {
+                "endpoint": ""
+            },
+            "Use Auth Config Explanation": "If enabled, the app will use the auth config. If disabled, the app will use the non-auth config. Auth config is standard oauth, non-auth config is an endpoint configured to return the spotify listening data with no authentication, such as https://github.com/ImLvna/spotify-listening",
+            "useAuthConfig": false
+        }
+    }
+}

@@ -1,0 +1,29 @@
+{
+    "core": {
+        "headless": false,
+        "listen": 7232,
+        "connect": "localhost:9000",
+        "logs": {
+            "incomingData": false,
+            "outgoingData": false,
+            "outgoingChatbox": false,
+            "errors": true
+        }
+    },
+    "modules": {
+        "spotify": {
+            "enabled": false,
+            "auth": {
+                "clientId": "",
+                "clientSecret": "",
+                "redirectUri": "",
+                "refreshToken": ""
+            },
+            "nonAuth": {
+                "endpoint": ""
+            },
+            "Use Auth Config Explanation": "If enabled, the app will use the auth config. If disabled, the app will use the non-auth config. Auth config is standard oauth, non-auth config is an endpoint configured to return the spotify listening data with no authentication, such as https://github.com/ImLvna/spotify-listening",
+            "useAuthConfig": false
+        }
+    }
+}
