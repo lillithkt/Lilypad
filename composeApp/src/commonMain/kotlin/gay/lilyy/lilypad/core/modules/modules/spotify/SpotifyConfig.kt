@@ -19,6 +19,7 @@ data class SpotifyNonAuthConfig(
 @Serializable
 data class SpotifyLyricsConfig(
     val enabled: Boolean = true,
+    val updateInterval: Int = 5000,
     @SerialName("Provider Explanation")
     val _providerExplanation: String = "The provider to use for lyrics. This is an instance of https://github.com/imlvna/spotify-lyrics-api",
     val provider: String = "https://spotify-lyrics-api.lvna.workers.dev"
