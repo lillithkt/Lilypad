@@ -1,23 +1,29 @@
-package gay.lilyy.lilypad.core.modules.coremodules
+package gay.lilyy.lilypad.core.modules.coremodules.core
 
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
-import gay.lilyy.lilypad.config.ConfigStorage
 import gay.lilyy.lilypad.core.modules.Module
+import gay.lilyy.lilypad.core.osc.OSCQuery
 import gay.lilyy.lilypad.core.osc.OSCReceiver
 import gay.lilyy.lilypad.core.osc.OSCSender
 
-class Core : Module() {
+class Core : Module<CoreConfig>() {
     override val name = "Core"
+
+    override val configClass = CoreConfig::class
+
+    init {
+        init()
+    }
 
     override val hasSettingsUI = true
 
     @Composable
     override fun onSettingsUI() {
-        var listenPort by remember { mutableStateOf(ConfigStorage.all.core.listen) }
-        var connectAddress by remember { mutableStateOf(ConfigStorage.all.core.connect) }
+        var listenPort by remember { mutableStateOf(config!!.listen) }
+        var connectAddress by remember { mutableStateOf(config!!.connect) }
 
         TextField(
             value = listenPort.toString(),
@@ -42,11 +48,12 @@ class Core : Module() {
         )
 
         Button(onClick = {
-            ConfigStorage.all.core.listen = listenPort
-            ConfigStorage.all.core.connect = connectAddress
-            ConfigStorage.save()
+            config!!.listen = listenPort
+            config!!.connect = connectAddress
+            saveConfig()
             OSCSender.updateAddress()
             OSCReceiver.updateAddress()
+            OSCQuery.updateAddress()
         }, enabled = connectAddressValid) {
             Text("Save")
         }
