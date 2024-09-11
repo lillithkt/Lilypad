@@ -8,6 +8,10 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
 
     override val configClass = SpotifyConfig::class
 
+    override fun buildChatbox(): List<String> {
+        return listOf("test")
+    }
+
     init {
         init()
     }

@@ -11,6 +11,7 @@ data class ServerLogsConfig(
     val errors: Boolean = true
 )
 
+
 @Serializable
 data class CoreConfig(
     val headless: Boolean = false,

@@ -13,7 +13,7 @@ abstract class ChatboxModule<T : Any>: Module<T>() {
      * Called to build the chatbox.
      * @return A string to be appended to the chatbox.
      */
-    open fun onChatboxBuild(): String? {
+    open fun buildChatbox(): List<String>? {
         return null
     }
 }

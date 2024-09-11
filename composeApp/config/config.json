@@ -8,9 +8,9 @@
             "gay.lilyy.lilypad.core.modules.modules"
         ],
         "logs": {
-            "incomingData": false,
-            "outgoingData": false,
-            "outgoingChatbox": false,
+            "incomingData": true,
+            "outgoingData": true,
+            "outgoingChatbox": true,
             "errors": true
         }
     },
@@ -36,29 +36,11 @@
         }
     },
     "chatbox": {
-        "enabled": true,
+        "enabled": false,
         "updateInterval": 2000,
-        "modules": {
-            "spotify": {
-                "enabled": false,
-                "lyrics": {
-                    "enabled": true,
-                    "Provider Explanation": "The provider to use for lyrics. This is an instance of https://github.com/imlvna/spotify-lyrics-api",
-                    "provider": "https://spotify-lyrics-api.lvna.workers.dev"
-                },
-                "auth": {
-                    "clientId": "",
-                    "clientSecret": "",
-                    "redirectUri": "",
-                    "refreshToken": ""
-                },
-                "nonAuth": {
-                    "endpoint": ""
-                },
-                "Use Auth Config Explanation": "If enabled, the app will use the auth config. If disabled, the app will use the non-auth config. Auth config is standard oauth, non-auth config is an endpoint configured to return the spotify listening data with no authentication, such as https://github.com/ImLvna/spotify-listening",
-                "useAuthConfig": false
-            }
-        }
+        "Trim Explanation": "You are limited to 9 lines and 144 characters total. trimByModule will not add that module to the chatbox if it pushes you over the limit. trimByLine will not add any extra lines that go over the limit, but will include the rest of the module",
+        "trimByModule": true,
+        "trimByLine": false
     },
     "spotify": {
         "enabled": false,

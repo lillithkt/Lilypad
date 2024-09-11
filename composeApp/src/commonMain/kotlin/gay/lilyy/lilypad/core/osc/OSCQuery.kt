@@ -6,20 +6,21 @@ import dev.slimevr.oscquery.OscTransport
 import dev.slimevr.oscquery.randomFreePort
 import gay.lilyy.lilypad.core.modules.Modules
 import gay.lilyy.lilypad.core.modules.coremodules.core.Core
+import io.github.aakira.napier.Napier
 
 object OSCQuery {
     var server: OSCQueryServer
 
     fun updateAddress() {
-        println("Updating OSCQuery address to ${(Modules.modules["Core"] as Core).config!!.listen}")
-        server.updateOscService((Modules.modules["Core"] as Core).config!!.listen.toUShort())
+        Napier.d("Updating OSCQuery address to ${Modules.get<Core>("Core")!!.config!!.listen}")
+        server.updateOscService(Modules.get<Core>("Core")!!.config!!.listen.toUShort())
 
     }
 
     init {
         // TODO: Fix this
         val port = randomFreePort()
-        server = OSCQueryServer("Lilypad", OscTransport.TCP, "127.0.0.1", (Modules.modules["Core"] as Core).config!!.listen.toUShort(), port)
+        server = OSCQueryServer("Lilypad", OscTransport.TCP, "127.0.0.1", Modules.get<Core>("Core")!!.config!!.listen.toUShort(), port)
         server.rootNode.addNode(OSCQueryNode("/tracking/vrsystem"))
         server.service.addServiceListener(
             "_osc._udp.local.",

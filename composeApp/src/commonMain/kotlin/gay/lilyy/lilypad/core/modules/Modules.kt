@@ -2,6 +2,7 @@ package gay.lilyy.lilypad.core.modules
 
 import androidx.compose.runtime.Composable
 import gay.lilyy.lilypad.core.modules.coremodules.core.Core
+import io.github.aakira.napier.Napier
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -38,15 +39,13 @@ abstract class Module<T : Any> {
                 }
             }
         } catch (e: Exception) {
-            println("Failed to load config for module $name")
-            e.printStackTrace()
+            Napier.e("Failed to load config for module $name", e)
             config = configClass?.java?.getDeclaredConstructor()?.newInstance()
         }
     }
 
     open fun saveConfig(write: Boolean = true) {
         if (config != null) {
-            println("Saving config for module $name")
             ConfigStorage.all[configName!!] = ConfigStorage.jsonEncoder.encodeToJsonElement(configClass!!.serializer(), config!!)
             if (write) {
                 ConfigStorage.save()
@@ -67,6 +66,10 @@ abstract class Module<T : Any> {
 object Modules {
     val modules: MutableMap<String, Module<*>> = mutableMapOf()
 
+    inline fun <reified T : Module<*>> get(name: String): T? {
+        return modules[name] as T?
+    }
+
     private fun registerModulesFromPackage(packageName: String) {
         val reflections = Reflections(packageName)
         val moduleClasses = reflections.getSubTypesOf(Module::class.java)
@@ -78,11 +81,10 @@ object Modules {
                     continue
                 }
                 val moduleInstance = moduleClass.getDeclaredConstructor().newInstance() as Module
-                println("Registering module ${moduleInstance.name}")
+                Napier.v("Registering module ${moduleInstance.name}")
                 modules[moduleInstance.name] = moduleInstance
             } catch (e: Exception) {
-                println("Failed to register module ${moduleClass.simpleName}")
-                e.printStackTrace()
+                Napier.e("Failed to register module ${moduleClass.simpleName}", e)
             }
         }
     }
@@ -90,7 +92,7 @@ object Modules {
     private fun registerModules() {
         registerModulesFromPackage("gay.lilyy.lilypad.core.modules.coremodules")
         if (modules["Core"] == null) {
-            println("Core module not found")
+            Napier.e("Core module not found")
             exitProcess(1)
         } else {
             val coreModule = modules["Core"] as Core
@@ -109,6 +111,7 @@ object ConfigStorage {
     val jsonEncoder = Json {
         prettyPrint = true
         encodeDefaults = true
+        ignoreUnknownKeys = true
     }
 
     private val configFile = File("config/config.json")
@@ -116,13 +119,13 @@ object ConfigStorage {
     var all: MutableMap<String, JsonElement> = mutableMapOf()
 
     init {
-        println("Loading config from ${configFile.absolutePath}")
+        Napier.v("Loading config from ${configFile.absolutePath}")
 
         all = if (configFile.exists()) {
             try {
                 jsonEncoder.decodeFromString<MutableMap<String, JsonElement>>(configFile.readText())
             } catch (e: Exception) {
-                println("Failed loading ${configFile.absolutePath}: ${e.message}")
+                Napier.e("Failed loading ${configFile.absolutePath}: ${e.message}", e)
                 mutableMapOf()
             }
         } else {

@@ -44,6 +44,8 @@ kotlin {
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.tabNavigator)
 
+            implementation(libs.napier)
+
             implementation(kotlin("reflect"))
             implementation(libs.reflections)
         }
