@@ -1,13 +1,18 @@
 package gay.lilyy.lilypad.ui
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import gay.lilyy.lilypad.core.modules.Modules
 import gay.lilyy.lilypad.core.startCore
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -26,7 +31,18 @@ fun App() {
     }
     MaterialTheme {
 
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        // Scrollable
+
+        val scrollState = rememberScrollState()
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .padding(8.dp)
+                .verticalScroll(scrollState)
+                .fillMaxWidth()
+        ) {
             Text("Settings", style = MaterialTheme.typography.h4)
 
             for (module in Modules.modules.values) {

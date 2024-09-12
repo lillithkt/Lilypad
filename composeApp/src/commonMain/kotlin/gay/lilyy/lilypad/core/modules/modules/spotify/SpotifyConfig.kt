@@ -5,10 +5,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SpotifyAuthConfig(
-    val clientId: String = "",
-    val clientSecret: String = "",
-    val redirectUri: String = "",
-    val refreshToken: String = ""
+    var clientId: String = "",
+    var clientSecret: String = "",
+    @SerialName("Token Explanation")
+    val _tokenExplanation: String = "Do not specify the token yourself. It will automatically be regenerated",
+    var token: String? = null
 )
 
 @Serializable
@@ -18,20 +19,20 @@ data class SpotifyNonAuthConfig(
 
 @Serializable
 data class SpotifyLyricsConfig(
-    val enabled: Boolean = true,
-    val updateInterval: Int = 5000,
+    var enabled: Boolean = true,
     @SerialName("Provider Explanation")
     val _providerExplanation: String = "The provider to use for lyrics. This is an instance of https://github.com/imlvna/spotify-lyrics-api",
-    val provider: String = "https://spotify-lyrics-api.lvna.workers.dev"
+    var provider: String = "https://spotify-lyrics-api.lvna.workers.dev"
 )
 
 @Serializable
 data class SpotifyConfig(
-    val enabled: Boolean = false,
+    var enabled: Boolean = false,
+    var updateInterval: Int = 5000,
     val lyrics: SpotifyLyricsConfig = SpotifyLyricsConfig(),
-    val auth: SpotifyAuthConfig? = SpotifyAuthConfig(),
-    val nonAuth: SpotifyNonAuthConfig? = SpotifyNonAuthConfig(),
+    var auth: SpotifyAuthConfig = SpotifyAuthConfig(),
+    var nonAuth: SpotifyNonAuthConfig = SpotifyNonAuthConfig(),
     @SerialName("Use Auth Config Explanation")
     val _useAuthConfigExplanation: String = "If enabled, the app will use the auth config. If disabled, the app will use the non-auth config. Auth config is standard oauth, non-auth config is an endpoint configured to return the spotify listening data with no authentication, such as https://github.com/ImLvna/spotify-listening",
-    val useAuthConfig: Boolean = false
+    var useAuthConfig: Boolean = false
 )

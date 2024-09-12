@@ -12,6 +12,8 @@ class MainActivity : ComponentActivity() {
         registerPreCloseListener()
         super.onCreate(savedInstanceState)
 
+        Shared.context = applicationContext
+
         setContent {
             App()
         }

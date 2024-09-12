@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class LyricsLineSyncedLine(
     val opposite: Boolean,
-    val start: Int,
-    val end: Int,
+    val start: Float,
+    val end: Float,
     val text: String
 )
 

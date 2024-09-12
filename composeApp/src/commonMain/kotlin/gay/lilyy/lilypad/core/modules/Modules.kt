@@ -3,6 +3,7 @@ package gay.lilyy.lilypad.core.modules
 import androidx.compose.runtime.Composable
 import gay.lilyy.lilypad.core.modules.coremodules.core.Core
 import io.github.aakira.napier.Napier
+import io.ktor.server.routing.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -62,6 +63,11 @@ abstract class Module<T : Any> {
      */
     @Composable
     open fun onSettingsUI() {}
+
+    // --- HTTP Server ---
+    open fun httpServerRouting(routing: Routing): Boolean {
+        return false
+    }
 }
 object Modules {
     val modules: MutableMap<String, Module<*>> = mutableMapOf()

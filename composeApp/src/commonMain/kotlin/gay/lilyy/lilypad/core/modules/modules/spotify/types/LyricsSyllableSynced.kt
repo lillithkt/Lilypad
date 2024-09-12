@@ -6,22 +6,22 @@ import kotlinx.serialization.Serializable
 data class SyllableLyricGroup(
     val words: String,
     val part: Boolean,
-    val start: Int,
-    val end: Int
+    val start: Float,
+    val end: Float
 )
 
 @Serializable
 data class Background(
     val groups: List<SyllableLyricGroup>,
-    val start: Int,
-    val end: Int
+    val start: Float,
+    val end: Float
 )
 
 @Serializable
 data class LyricsSyllableSyncedLine(
     val opposite: Boolean,
-    val start: Int,
-    val end: Int,
+    val start: Float,
+    val end: Float,
     val lead: List<SyllableLyricGroup>?,
     val background: Background?
 )

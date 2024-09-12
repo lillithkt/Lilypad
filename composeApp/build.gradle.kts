@@ -46,6 +46,18 @@ kotlin {
 
             implementation(libs.napier)
 
+            implementation(libs.spotify)
+
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.serialization)
+            implementation(libs.ktor.client.cio)
+            implementation(libs.ktor.client.content.negotiation)
+
+            implementation(libs.ktor.server.core)
+            implementation(libs.ktor.server.netty)
+
+            implementation(libs.ktor.serialization.kotlinx.json)
+
             implementation(kotlin("reflect"))
             implementation(libs.reflections)
         }
