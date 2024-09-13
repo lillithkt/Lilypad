@@ -49,7 +49,7 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
         if (track?.asTrack == null) {
             return output
         }
-        output.add("\uD83D\uDCFB ${track.asTrack!!.name} - ${track.asTrack!!.artists.map { it.name }.filterNotNull().joinToString(", ")}")
+        output.add("\uD83D\uDCFB ${track.asTrack!!.name} - ${track.asTrack!!.artists.mapNotNull { it.name }.joinToString(", ")}")
         if (config!!.lyrics.enabled && lyrics !== null && lyrics!!.unsynced === null) {
             output.add(when {
                 lyrics!!.lineSynced !== null -> {

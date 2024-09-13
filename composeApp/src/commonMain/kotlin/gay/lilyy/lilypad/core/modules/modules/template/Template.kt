@@ -1,4 +1,4 @@
-package gay.lilyy.lilypad.core.modules.modules.clock
+package gay.lilyy.lilypad.core.modules.modules.template
 
 import androidx.compose.runtime.*
 import gay.lilyy.lilypad.core.modules.Module
