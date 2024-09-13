@@ -70,11 +70,6 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
                     val chatbox = output.joinToString("\n")
                     if (Modules.get<Core>("Core")!!.config!!.logs.outgoingChatbox) Napier.v(chatbox)
                     OSCSender.send(OSCMessage("/chatbox/input", listOf(chatbox)))
-                    OSCSender.send(
-                        OSCMessage(
-                            "/chatbox/input", listOf(chatbox)
-                        )
-                    )
                     lastOutput = output
                     resetTimeout()
                 }
