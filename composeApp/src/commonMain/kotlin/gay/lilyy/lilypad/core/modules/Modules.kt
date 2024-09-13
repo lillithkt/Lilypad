@@ -87,6 +87,7 @@ object Modules {
                     continue
                 }
                 val moduleInstance = moduleClass.getDeclaredConstructor().newInstance() as Module
+                if (moduleInstance.name === "Template") continue
                 Napier.v("Registering module ${moduleInstance.name}")
                 modules[moduleInstance.name] = moduleInstance
             } catch (e: Exception) {

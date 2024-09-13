@@ -9,7 +9,8 @@ data class SpotifyAuthConfig(
     var clientSecret: String = "",
     @SerialName("Token Explanation")
     val _tokenExplanation: String = "Do not specify the token yourself. It will automatically be regenerated",
-    var token: String? = null
+    var token: String? = null,
+    var refreshToken: String? = null,
 )
 
 @Serializable

@@ -23,6 +23,7 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -32,6 +33,7 @@ import kotlinx.serialization.json.*
 const val REDIRECT_URL = "/spotify/callback"
 
 @Suppress("unused")
+@DelicateCoroutinesApi
 class Spotify : ChatboxModule<SpotifyConfig>() {
     override val name = "Spotify"
 
@@ -90,10 +92,17 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                 clientSecret = config!!.auth.clientSecret,
                 redirectUri = "http://localhost:${Constants.HTTP_PORT}$REDIRECT_URL",
                 authorization = SpotifyUserAuthorization(
-                    authorizationCode = code
+                    authorizationCode = code,
                 )
-            ).build()
+            ) {
+                onTokenRefresh = {
+                    config!!.auth.token = it.token.accessToken
+                    config!!.auth.refreshToken = it.token.refreshToken
+                    saveConfig()
+                }
+            }.build()
             config!!.auth.token = spotifyClient!!.token.accessToken
+            config!!.auth.refreshToken = spotifyClient!!.token.refreshToken
             saveConfig(true)
             call.respondText("Logged in! You may close this tab now.")
             HTTPServer.unlock("spotify")
@@ -103,21 +112,28 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
 
     private var spotifyClient: SpotifyClientApi? = null
 
-    private suspend fun updateSpotifyClient() {
+    private suspend fun updateSpotifyClient(reauth: Boolean = false) {
         if (config!!.useAuthConfig) {
             if (config!!.auth.clientId.isEmpty() || config!!.auth.clientSecret.isEmpty()) {
                 spotifyClient = null
                 return
             }
-            if (!config!!.auth.token.isNullOrEmpty()) {
+            if (!config!!.auth.token.isNullOrEmpty() && !reauth) {
                 spotifyClient = spotifyClientApi(
                     clientId = config!!.auth.clientId,
                     clientSecret = config!!.auth.clientSecret,
                     redirectUri = "http://localhost:${Constants.HTTP_PORT}$REDIRECT_URL",
                     authorization = SpotifyUserAuthorization(
-                        tokenString = config!!.auth.token
+                        tokenString = config!!.auth.token,
+                        refreshTokenString = config!!.auth.refreshToken
                     )
-                ).build()
+                ) {
+                    onTokenRefresh = {
+                        config!!.auth.token = it.token.accessToken
+                        config!!.auth.refreshToken = it.token.refreshToken
+                        saveConfig()
+                    }
+                }.build()
                 return
             }
             if (HTTPServer.hasLock("spotify")) {
@@ -149,6 +165,7 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                     updateNowPlaying()
                 } catch (e: Exception) {
                     Napier.e("Failed to update now playing", e)
+                    updateSpotifyClient(true)
                 }
                 Napier.d(nowPlaying.toString())
                 Thread.sleep(5000)
