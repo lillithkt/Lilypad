@@ -118,7 +118,7 @@ object ConfigStorage {
         ignoreUnknownKeys = true
     }
 
-    private val configFile = File("config/config.json")
+    private val configFile = File("config.json")
 
     var all: MutableMap<String, JsonElement> = mutableMapOf()
 
