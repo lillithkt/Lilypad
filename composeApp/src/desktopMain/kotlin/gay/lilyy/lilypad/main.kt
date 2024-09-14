@@ -13,7 +13,7 @@ import io.github.aakira.napier.Napier
 fun main() {
     registerPreCloseListener()
     if (Modules.Core.config!!.headless) {
-        if (Modules.Core.config!!.logs.debug) Napier.i("Lilypad is running in headless mode.")
+        Napier.i("Lilypad is running in headless mode.")
         startCore()
     } else
         application {
