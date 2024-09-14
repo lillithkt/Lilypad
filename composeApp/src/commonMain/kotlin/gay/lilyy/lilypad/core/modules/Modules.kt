@@ -12,7 +12,6 @@ import org.reflections.Reflections
 import java.io.File
 import java.util.*
 import kotlin.reflect.KClass
-import kotlin.system.exitProcess
 
 @OptIn(kotlinx. serialization. InternalSerializationApi::class)
 abstract class Module<T : Any> {
@@ -40,7 +39,7 @@ abstract class Module<T : Any> {
                 }
             }
         } catch (e: Exception) {
-            Napier.e("Failed to load config for module $name", e)
+            if (Modules.Core.config!!.logs.errors) Napier.e("Failed to load config for module $name", e)
             config = configClass?.java?.getDeclaredConstructor()?.newInstance()
         }
     }
@@ -70,7 +69,10 @@ abstract class Module<T : Any> {
     }
 }
 object Modules {
-    val modules: MutableMap<String, Module<*>> = mutableMapOf()
+    val modules: MutableMap<String, Module<*>> = mutableMapOf("Core" to Core())
+    
+    val Core: Core
+        get() = get("Core")!!
 
     inline fun <reified T : Module<*>> get(name: String): T? {
         return modules[name] as T?
@@ -81,31 +83,26 @@ object Modules {
         val moduleClasses = reflections.getSubTypesOf(Module::class.java)
 
         for (moduleClass in moduleClasses) {
+            val core = get<Core>("Core")
             try {
                 // Check if the module is abstract
-                if (moduleClass.kotlin.isAbstract) {
+                if (moduleClass.kotlin.isAbstract || moduleClass.isInstance(Core::class)) {
                     continue
                 }
                 val moduleInstance = moduleClass.getDeclaredConstructor().newInstance() as Module
                 if (moduleInstance.name === "Template") continue
-                Napier.v("Registering module ${moduleInstance.name}")
+                if (core?.config?.logs?.debug == true) Napier.v("Registering module ${moduleInstance.name}")
                 modules[moduleInstance.name] = moduleInstance
             } catch (e: Exception) {
-                Napier.e("Failed to register module ${moduleClass.simpleName}", e)
+                if (core?.config?.logs?.errors == true) Napier.e("Failed to register module ${moduleClass.simpleName}", e)
             }
         }
     }
 
     private fun registerModules() {
         registerModulesFromPackage("gay.lilyy.lilypad.core.modules.coremodules")
-        if (modules["Core"] == null) {
-            Napier.e("Core module not found")
-            exitProcess(1)
-        } else {
-            val coreModule = modules["Core"] as Core
-            for (packageName in coreModule.config!!.modulePackages) {
-                registerModulesFromPackage(packageName)
-            }
+        for (packageName in Core.config!!.modulePackages) {
+            registerModulesFromPackage(packageName)
         }
     }
 
@@ -126,13 +123,16 @@ object ConfigStorage {
     var all: MutableMap<String, JsonElement> = mutableMapOf()
 
     init {
-        Napier.v("Loading config from ${configFile.absolutePath}")
-
+        try {
+            if (Modules.Core.config?.logs?.debug == true) Napier.v("Loading config from ${configFile.absolutePath}")
+        } catch(e: Exception) {
+            /* no-op */
+        }
         all = if (configFile.exists()) {
             try {
                 jsonEncoder.decodeFromString<MutableMap<String, JsonElement>>(configFile.readText())
             } catch (e: Exception) {
-                Napier.e("Failed loading ${configFile.absolutePath}: ${e.message}", e)
+                if (Modules.Core.config?.logs?.errors == true) Napier.e("Failed loading ${configFile.absolutePath}: ${e.message}", e)
                 mutableMapOf()
             }
         } else {
@@ -141,7 +141,7 @@ object ConfigStorage {
     }
 
     fun save() {
-        println("Saving config to ${configFile.absolutePath}")
+        if (Modules.Core.config?.logs?.debug == true) Napier.v("Saving config to ${configFile.absolutePath}")
         configFile.writeText(jsonEncoder.encodeToString(all))
     }
 }

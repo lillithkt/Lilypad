@@ -13,7 +13,7 @@ object HTTPServer {
         routing {
             for (module in Modules.modules.values) {
                 if (module.httpServerRouting(this)) {
-                    Napier.d("Registered routing for module ${module.name}")
+                    if (Modules.Core.config!!.logs.debug) Napier.d("Registered routing for module ${module.name}")
                 }
             }
         }

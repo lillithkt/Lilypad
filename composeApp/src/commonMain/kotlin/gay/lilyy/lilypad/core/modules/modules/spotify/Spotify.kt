@@ -8,6 +8,7 @@ import com.adamratzman.spotify.*
 import com.adamratzman.spotify.models.CurrentlyPlayingObject
 import gay.lilyy.lilypad.core.Constants
 import gay.lilyy.lilypad.core.HTTPServer
+import gay.lilyy.lilypad.core.modules.Modules
 import gay.lilyy.lilypad.core.modules.coremodules.chatbox.ChatboxModule
 import gay.lilyy.lilypad.core.modules.modules.spotify.types.Lyrics
 import gay.lilyy.lilypad.core.modules.modules.spotify.types.SyncType
@@ -23,10 +24,7 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.serialization.json.*
 
 
@@ -147,7 +145,7 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                 redirectUri = "http://localhost:${Constants.HTTP_PORT}$REDIRECT_URL"
             )
             HTTPServer.lock("spotify")
-            Napier.d("Opening browser to $url")
+            if (Modules.Core.config!!.logs.debug) Napier.d("Opening browser to $url")
             openUrlInBrowser(url)
         } else {
             spotifyClient = null
@@ -159,15 +157,16 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
 
 
         // Call the suspend updateNowPlaying function every 5 seconds in Dispatchers.IO
-        GlobalScope.launch(Dispatchers.IO) {
+        val scope = CoroutineScope(Dispatchers.Default)
+
+        scope.launch {
             while (true) {
                 try {
                     updateNowPlaying()
                 } catch (e: Exception) {
-                    Napier.e("Failed to update now playing", e)
+                    if (Modules.Core.config!!.logs.errors) Napier.e("Failed to update now playing", e)
                     updateSpotifyClient(true)
                 }
-                Napier.d(nowPlaying.toString())
                 Thread.sleep(5000)
             }
         }

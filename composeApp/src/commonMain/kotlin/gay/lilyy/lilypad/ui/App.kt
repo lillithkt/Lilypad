@@ -1,9 +1,6 @@
 package gay.lilyy.lilypad.ui
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
@@ -35,11 +32,21 @@ fun App() {
 
         val scrollState = rememberScrollState()
 
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+                .height(64.dp)
+        ) {
+            Text("Lilypad", style = MaterialTheme.typography.h3)
+            CurrentChatbox()
+        }
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .padding(8.dp)
+                .padding(top = 64.dp)
                 .verticalScroll(scrollState)
                 .fillMaxWidth()
         ) {

@@ -1,6 +1,7 @@
 package gay.lilyy.lilypad.core.modules.coremodules.core
 
 import androidx.compose.material.Button
+import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
@@ -55,7 +56,67 @@ class Core : Module<CoreConfig>() {
             OSCReceiver.updateAddress()
             OSCQuery.updateAddress()
         }, enabled = connectAddressValid) {
-            Text("Save")
+            Text("Update OSC")
+        }
+
+        var logsOpen by remember { mutableStateOf(false) }
+        Button(onClick = { logsOpen = !logsOpen }) {
+            Text("Logs")
+        }
+        if (logsOpen) {
+            var outgoingChatbox by remember { mutableStateOf(config!!.logs.outgoingChatbox) }
+            Text("Outgoing chatbox")
+            TextField(
+                value = outgoingChatbox.toString(),
+                onValueChange = { outgoingChatbox = it.toBoolean()
+                                config!!.logs.outgoingChatbox = it.toBoolean()
+                    saveConfig()
+                },
+            )
+            Text("Incoming OSC")
+            Checkbox(
+                checked = config!!.logs.incomingData,
+                onCheckedChange = {
+                    config!!.logs.incomingData = it
+                    saveConfig()
+                }
+            )
+            Text("Outgoing OSC")
+            Checkbox(
+                checked = config!!.logs.outgoingData,
+                onCheckedChange = {
+                    config!!.logs.outgoingData = it
+                    saveConfig()
+                }
+            )
+            Text("Errors")
+            Checkbox(
+                checked = config!!.logs.errors,
+                onCheckedChange = {
+                    config!!.logs.errors = it
+                    saveConfig()
+                }
+            )
+            var warnings by remember { mutableStateOf(config!!.logs.warnings) }
+            Text("Warnings")
+            Checkbox(
+                checked = warnings,
+                onCheckedChange = {
+                    warnings = it
+                    config!!.logs.warnings = it
+                    saveConfig()
+                }
+            )
+            var debug by remember { mutableStateOf(config!!.logs.debug) }
+            Text("Debug")
+            Checkbox(
+                checked = debug,
+                onCheckedChange = {
+                    debug = it
+                    config!!.logs.debug = it
+                    saveConfig()
+                }
+            )
         }
     }
 }

@@ -4,11 +4,15 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.illposed.osc.OSCMessage
 import gay.lilyy.lilypad.core.modules.Modules
-import gay.lilyy.lilypad.core.modules.coremodules.core.Core
 import gay.lilyy.lilypad.core.osc.OSCSender
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 const val maxLines = 9
 const val maxChars = 144
@@ -19,7 +23,7 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
 
     override val configClass = ChatboxConfig::class
 
-    private var lastOutput: List<String?> = emptyList()
+    var lastOutput: SnapshotStateList<String?> = mutableStateListOf()
     private var timeoutUp: Boolean = true
 
     private fun build(): List<String> {
@@ -62,25 +66,33 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
         }.start()
     }
 
-    private fun loopBuildChatbox() {
+    private suspend fun loopBuildChatbox() {
         while (true) {
             val output = build()
-            if (output != lastOutput) {
-                if (timeoutUp) {
-                    val chatbox = output.joinToString("\n")
-                    if (Modules.get<Core>("Core")!!.config!!.logs.outgoingChatbox) Napier.v(chatbox)
-                    OSCSender.send(OSCMessage("/chatbox/input", listOf(chatbox)))
-                    lastOutput = output
-                    resetTimeout()
+            withContext(Dispatchers.Main) {
+                if (output != lastOutput) {
+                    if (timeoutUp) {
+                        val chatbox = output.joinToString("\n")
+                        if (Modules.Core.config!!.logs.outgoingChatbox) Napier.v(chatbox)
+                        OSCSender.send(OSCMessage("/chatbox/input", listOf(chatbox)))
+                        val scope = CoroutineScope(Dispatchers.Main)
+                        scope.launch {
+                            lastOutput.clear()
+                            lastOutput.addAll(output)
+                        }
+                        resetTimeout()
+                    }
                 }
             }
-            Thread.sleep(250)
+            withContext(Dispatchers.IO) {
+                Thread.sleep(250)
+            }
         }
     }
 
     fun clearChatbox(onlyIfDisabled: Boolean = false) {
         if (onlyIfDisabled && config!!.enabled) return
-        if (Modules.get<Core>("Core")!!.config!!.logs.outgoingChatbox) Napier.v("Clearing chatbox")
+        if (Modules.Core.config!!.logs.outgoingChatbox) Napier.v("Clearing chatbox")
         OSCSender.send(
             OSCMessage(
                 "/chatbox/input", listOf(
@@ -92,13 +104,13 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
         Thread {
             Thread.sleep(250)
             if (onlyIfDisabled && config!!.enabled) return@Thread
-                OSCSender.send(
-                    OSCMessage(
-                        "/chatbox/input", listOf(
-                            ""
-                        )
+            OSCSender.send(
+                OSCMessage(
+                    "/chatbox/input", listOf(
+                        ""
                     )
                 )
+            )
         }.start()
     }
 
@@ -131,9 +143,10 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
 
     init {
         init()
+        val scope = CoroutineScope(Dispatchers.IO)
 
-        Thread {
+        scope.launch {
             loopBuildChatbox()
-        }.start()
+        }
     }
 }
