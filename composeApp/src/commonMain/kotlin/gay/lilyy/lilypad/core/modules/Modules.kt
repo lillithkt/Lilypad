@@ -40,7 +40,6 @@ abstract class Module<T : Any> {
             }
         } catch (e: Exception) {
             if (Modules.Core.config!!.logs.errors) Napier.e("Failed to load config for module $name", e)
-            config = configClass?.java?.getDeclaredConstructor()?.newInstance()
         }
     }
 
