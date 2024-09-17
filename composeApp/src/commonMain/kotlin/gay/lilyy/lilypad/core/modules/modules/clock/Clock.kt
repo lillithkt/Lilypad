@@ -45,8 +45,4 @@ class Clock : ChatboxModule<ClockConfig>() {
             }
         )
     }
-
-    init {
-        init()
-    }
 }

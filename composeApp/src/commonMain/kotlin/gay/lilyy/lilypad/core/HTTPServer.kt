@@ -20,7 +20,7 @@ object HTTPServer {
     }
 
     fun lock(lock: String) {
-        if (locks.contains(lock)) return
+        if (hasLock(lock)) return
         locks.add(lock)
         if (locks.size == 1) {
             server.start(wait = false)
@@ -28,7 +28,7 @@ object HTTPServer {
     }
 
     fun unlock(lock: String) {
-        if (!locks.contains(lock)) return
+        if (!hasLock(lock)) return
         locks.remove(lock)
         if (locks.isEmpty()) {
             server.stop(1000, 1000)

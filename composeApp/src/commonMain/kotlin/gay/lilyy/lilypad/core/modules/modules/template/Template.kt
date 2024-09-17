@@ -19,8 +19,4 @@ class Template : Module<TemplateConfig>() {
     @Composable
     override fun onSettingsUI() {
     }
-
-    init {
-        init()
-    }
 }

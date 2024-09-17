@@ -15,10 +15,6 @@ class Core : Module<CoreConfig>() {
 
     override val configClass = CoreConfig::class
 
-    init {
-        init()
-    }
-
     override val hasSettingsUI = true
 
     @Composable

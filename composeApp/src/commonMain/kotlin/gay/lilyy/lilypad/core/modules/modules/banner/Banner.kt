@@ -143,8 +143,8 @@ class Banner : ChatboxModule<BannerConfig>() {
         return listOf(possibleMessages[random % possibleMessages.size])
     }
 
-    init {
-        init()
+    override fun init() {
+        super.init()
 
         Thread {
             while (true) {

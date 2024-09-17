@@ -78,7 +78,6 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
     }
 
     override fun httpServerRouting(routing: Routing): Boolean {
-        println("Spotify routing")
         routing.get("/spotify/callback") {
             val code = call.request.queryParameters["code"]
             if (code.isNullOrEmpty()) {
@@ -123,7 +122,7 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                     redirectUri = "http://localhost:${Constants.HTTP_PORT}$REDIRECT_URL",
                     authorization = SpotifyUserAuthorization(
                         tokenString = config!!.auth.token,
-                        refreshTokenString = config!!.auth.refreshToken
+//                        refreshTokenString = config!!.auth.refreshToken
                     )
                 ) {
                     onTokenRefresh = {
@@ -152,8 +151,8 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
         }
     }
 
-    init {
-        init()
+    override fun init() {
+        super.init()
 
 
         // Call the suspend updateNowPlaying function every 5 seconds in Dispatchers.IO
@@ -167,7 +166,7 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                     if (Modules.Core.config!!.logs.errors) Napier.e("Failed to update now playing", e)
                     updateSpotifyClient(true)
                 }
-                Thread.sleep(5000)
+                Thread.sleep(config!!.updateInterval.toLong())
             }
         }
 

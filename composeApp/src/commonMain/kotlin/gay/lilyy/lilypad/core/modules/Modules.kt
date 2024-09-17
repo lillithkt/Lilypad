@@ -17,13 +17,15 @@ import kotlin.reflect.KClass
 abstract class Module<T : Any> {
     abstract val name: String
 
+    open val disabled: Boolean = false
+
     // --- Config ---
     open var configName: String? = null
     open val configClass: KClass<T>? = null
 
     var config: T? = null
 
-    fun init() {
+    open fun init() {
         configName = configName ?: name.replace(" ", "").lowercase(Locale.getDefault())
         loadConfig()
     }
@@ -82,18 +84,18 @@ object Modules {
         val moduleClasses = reflections.getSubTypesOf(Module::class.java)
 
         for (moduleClass in moduleClasses) {
-            val core = get<Core>("Core")
             try {
                 // Check if the module is abstract
-                if (moduleClass.kotlin.isAbstract || moduleClass.isInstance(Core::class)) {
+                if (moduleClass.kotlin.isAbstract || moduleClass === Core::class.java) {
                     continue
                 }
                 val moduleInstance = moduleClass.getDeclaredConstructor().newInstance() as Module
                 if (moduleInstance.name === "Template") continue
-                if (core?.config?.logs?.debug == true) Napier.v("Registering module ${moduleInstance.name}")
+                if (Core.config!!.logs.debug) Napier.v("Registering module ${moduleInstance.name}")
                 modules[moduleInstance.name] = moduleInstance
+                if (!moduleInstance.disabled) moduleInstance.init()
             } catch (e: Exception) {
-                if (core?.config?.logs?.errors == true) Napier.e("Failed to register module ${moduleClass.simpleName}", e)
+                if (Core.config!!.logs.errors) Napier.e("Failed to register module ${moduleClass.simpleName}", e)
             }
         }
     }
@@ -106,6 +108,7 @@ object Modules {
     }
 
     init {
+        Core.init()
         registerModules()
     }
 }

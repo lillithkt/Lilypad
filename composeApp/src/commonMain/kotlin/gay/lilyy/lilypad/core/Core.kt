@@ -6,10 +6,11 @@ import gay.lilyy.lilypad.core.osc.OSCSender
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 
-fun startCore() {
+fun globalInit() {
     Napier.base(DebugAntilog())
+}
 
-
+fun startCore() {
     // Initialize OSC components
     OSCQuery
     OSCReceiver

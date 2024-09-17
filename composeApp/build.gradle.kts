@@ -58,6 +58,8 @@ kotlin {
 
             implementation(libs.ktor.serialization.kotlinx.json)
 
+            implementation(libs.kfswatch)
+
             implementation(kotlin("reflect"))
             implementation(libs.reflections)
         }

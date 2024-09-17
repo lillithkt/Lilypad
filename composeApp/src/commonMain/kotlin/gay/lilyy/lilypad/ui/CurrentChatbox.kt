@@ -18,7 +18,6 @@ fun CurrentChatbox() {
         return
     }
 
-    // Safely observe lastOutput changes using snapshotFlow
     var chatboxText by remember { mutableStateOf("") }
 
     LaunchedEffect(chatboxModule.lastOutput) {
@@ -28,7 +27,7 @@ fun CurrentChatbox() {
             }
     }
 
-    Text(chatboxText, style = MaterialTheme.typography.h6.merge(
+    Text(chatboxText, style = MaterialTheme.typography.body1.merge(
         // Center text
         TextStyle(textAlign = TextAlign.Center)
     ))

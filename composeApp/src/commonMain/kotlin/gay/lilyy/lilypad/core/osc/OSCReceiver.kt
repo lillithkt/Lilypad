@@ -23,7 +23,11 @@ object OSCReceiver {
 
     init {
         updateAddress()
+        addListener({ true }) {
+            if (Modules.Core.config!!.logs.incomingData) Napier.d("Received message: ${it.message.address} ${it.message.arguments.joinToString()}")
+        }
     }
+
 
     fun addListener(matches: (OSCMessageEvent) -> Boolean, listener: OSCMessageListener) {
         val selector = object : MessageSelector {

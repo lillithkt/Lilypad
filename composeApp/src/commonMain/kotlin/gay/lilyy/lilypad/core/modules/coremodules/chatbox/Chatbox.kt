@@ -74,7 +74,7 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
                     if (timeoutUp) {
                         val chatbox = output.joinToString("\n")
                         if (Modules.Core.config!!.logs.outgoingChatbox) Napier.v(chatbox)
-                        OSCSender.send(OSCMessage("/chatbox/input", listOf(chatbox)))
+                        OSCSender.send(OSCMessage("/chatbox/input", listOf(chatbox, true, false)))
                         val scope = CoroutineScope(Dispatchers.Main)
                         scope.launch {
                             lastOutput.clear()
@@ -96,7 +96,9 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
         OSCSender.send(
             OSCMessage(
                 "/chatbox/input", listOf(
-                    ""
+                    "",
+                    true,
+                    false
                 )
             )
         )
@@ -107,7 +109,9 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
             OSCSender.send(
                 OSCMessage(
                     "/chatbox/input", listOf(
-                        ""
+                        "",
+                        true,
+                        false
                     )
                 )
             )
@@ -128,7 +132,7 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
                 enabled = it
                 config!!.enabled = it
                 if (!it) {
-                    clearChatbox()
+                    clearChatbox(true)
                 }
                 saveConfig()
             },
@@ -141,8 +145,8 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
         )
     }
 
-    init {
-        init()
+    override fun init() {
+        super.init()
         val scope = CoroutineScope(Dispatchers.IO)
 
         scope.launch {
