@@ -20,11 +20,15 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import io.ktor.serialization.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.util.reflect.*
 import kotlinx.coroutines.*
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.json.*
 
 
@@ -207,6 +211,7 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
         }
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     private suspend fun updateNowPlaying() {
         if (!config!!.enabled) return
         val oldId = nowPlaying?.item?.id
@@ -214,7 +219,16 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
             if (config!!.nonAuth.endpoint.isNotEmpty()) {
                 val response = httpClient.get(config!!.nonAuth.endpoint)
                 if (response.status == HttpStatusCode.OK) {
-                    nowPlaying = response.body()
+                    try {
+                        nowPlaying = response.body()
+                    } catch(e: Exception) {
+                        if (e.instanceOf(MissingFieldException::class) || e.instanceOf(JsonConvertException::class)) {
+                            if (Modules.Core.config!!.logs.debug) Napier.d("No song playing")
+                            nowPlaying = null
+                        } else {
+                            if (Modules.Core.config!!.logs.errors) Napier.e("Failed to get currently playing", e)
+                        }
+                    }
                 }
             } else {
                 return
@@ -224,7 +238,17 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                 updateSpotifyClient()
             }
             if (spotifyClient != null) {
+                try {
                 nowPlaying = spotifyClient!!.player.getCurrentlyPlaying()
+                } catch (e: Exception) {
+                    if (e.instanceOf(MissingFieldException::class) || e.instanceOf(JsonConvertException::class)) {
+                        if (Modules.Core.config!!.logs.debug) Napier.d("No song playing")
+                        nowPlaying = null
+                    } else {
+                        if (Modules.Core.config!!.logs.errors) Napier.e("Failed to get currently playing", e)
+                        updateSpotifyClient(true)
+                    }
+                }
             }
         }
 

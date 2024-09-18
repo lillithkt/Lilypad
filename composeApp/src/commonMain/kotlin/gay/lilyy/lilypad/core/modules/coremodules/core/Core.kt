@@ -22,6 +22,9 @@ class Core : Module<CoreConfig>() {
         var listenPort by remember { mutableStateOf(config!!.listen) }
         var connectAddress by remember { mutableStateOf(config!!.connect) }
 
+        val oscQAddress by remember { OSCQuery.address }
+        val oscQPort by remember { OSCQuery.port }
+
         TextField(
             value = listenPort.toString(),
             onValueChange = { listenPort = it.toIntOrNull() ?: 0 },
@@ -37,10 +40,11 @@ class Core : Module<CoreConfig>() {
             Text("Invalid connect address")
         }
         TextField(
-            value = connectAddress,
+            value = if (oscQAddress != null && oscQPort != null) "${oscQAddress}:${oscQPort}" else connectAddress,
             onValueChange = { connectAddress = it
                 validateConnectAddress()
             },
+            enabled = oscQAddress == null && oscQPort == null,
             label = { Text("Connect address") }
         )
 
@@ -50,7 +54,7 @@ class Core : Module<CoreConfig>() {
             saveConfig()
             OSCSender.updateAddress()
             OSCReceiver.updateAddress()
-            OSCQuery.updateAddress()
+            OSCQuery.update()
         }, enabled = connectAddressValid) {
             Text("Update OSC")
         }
@@ -62,33 +66,40 @@ class Core : Module<CoreConfig>() {
         if (logsOpen) {
             var outgoingChatbox by remember { mutableStateOf(config!!.logs.outgoingChatbox) }
             Text("Outgoing chatbox")
-            TextField(
-                value = outgoingChatbox.toString(),
-                onValueChange = { outgoingChatbox = it.toBoolean()
-                                config!!.logs.outgoingChatbox = it.toBoolean()
+            Checkbox(
+                checked = outgoingChatbox,
+                onCheckedChange = {
+                    outgoingChatbox = it
+                    config!!.logs.outgoingChatbox = it
                     saveConfig()
-                },
+                }
             )
+            var incomingOSC by remember { mutableStateOf(config!!.logs.incomingData) }
             Text("Incoming OSC")
             Checkbox(
-                checked = config!!.logs.incomingData,
+                checked = incomingOSC,
                 onCheckedChange = {
+                    incomingOSC = it
                     config!!.logs.incomingData = it
                     saveConfig()
                 }
             )
+            var outgoingOSC by remember { mutableStateOf(config!!.logs.outgoingData) }
             Text("Outgoing OSC")
             Checkbox(
-                checked = config!!.logs.outgoingData,
+                checked = outgoingOSC,
                 onCheckedChange = {
+                    outgoingOSC = it
                     config!!.logs.outgoingData = it
                     saveConfig()
                 }
             )
+            var errors by remember { mutableStateOf(config!!.logs.errors) }
             Text("Errors")
             Checkbox(
-                checked = config!!.logs.errors,
+                checked = errors,
                 onCheckedChange = {
+                    errors = it
                     config!!.logs.errors = it
                     saveConfig()
                 }
