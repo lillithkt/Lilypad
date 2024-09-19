@@ -26,7 +26,7 @@ object OSCQuery {
     }
 
     init {
-        // TODO: Fix this
+        System.setProperty("java.net.preferIPv4Stack", "true") // https://github.com/jmdns/jmdns/issues/244
         val httpPort = randomFreePort()
         server = OSCQueryServer("Lilypad", OscTransport.UDP, Utils.getLocalIp(), Modules.Core.config!!.listen.toUShort(), httpPort)
         server.rootNode.addNode(OSCQueryNode("/avatar"))
@@ -48,7 +48,5 @@ object OSCQuery {
             }
         )
         server.init()
-
-        server.createOscService()
     }
 }
