@@ -14,7 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import gay.lilyy.lilypad.core.modules.Modules
-import gay.lilyy.lilypad.core.modules.coremodules.gamestorage.GameStorage
+import gay.lilyy.lilypad.core.CoreModules.Coremodules.gamestorage.GameStorage
+import gay.lilyy.lilypad.core.modules.CoreModules
 import gay.lilyy.lilypad.core.startCore
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -41,9 +42,7 @@ fun App() {
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Lilypad", style = MaterialTheme.typography.h3)
-
-            val gs = Modules.get<GameStorage>("GameStorage")!!
-            val curUsername by remember { gs.curUsername }
+            val curUsername by remember { CoreModules.GameStorage.curUsername }
             if (curUsername != null) {
                 Text("Welcome, $curUsername", style = MaterialTheme.typography.h6)
             }

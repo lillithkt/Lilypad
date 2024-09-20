@@ -1,4 +1,4 @@
-package gay.lilyy.lilypad.core.modules.coremodules.core
+package gay.lilyy.lilypad.core.CoreModules.CoreCoreModules.Core
 
 import androidx.compose.material.Button
 import androidx.compose.material.Checkbox

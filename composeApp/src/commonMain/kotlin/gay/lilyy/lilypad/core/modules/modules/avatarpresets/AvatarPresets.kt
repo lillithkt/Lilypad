@@ -8,7 +8,7 @@ import androidx.compose.runtime.*
 import com.illposed.osc.OSCMessage
 import gay.lilyy.lilypad.core.modules.Module
 import gay.lilyy.lilypad.core.modules.Modules
-import gay.lilyy.lilypad.core.modules.coremodules.gamestorage.GameStorage
+import gay.lilyy.lilypad.core.modules.CoreModules
 import gay.lilyy.lilypad.core.osc.*
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.launch
@@ -40,10 +40,10 @@ class AvatarPresets : Module<AvatarPresetsConfig>() {
     override val hasSettingsUI = true
 
     private suspend fun savePreset(index: Int) {
-        if (Modules.Core.config!!.logs.debug) Napier.d("Saving preset $index")
+        if (CoreModules.Core.config!!.logs.debug) Napier.d("Saving preset $index")
         val rootNode = OSCQJson.getNode("/")
         if (rootNode === null) {
-            if (Modules.Core.config!!.logs.errors) Napier.e("Failed to get root node")
+            if (CoreModules.Core.config!!.logs.errors) Napier.e("Failed to get root node")
             return
         }
         val parameters = mutableMapOf<String, Parameter>()
@@ -61,13 +61,12 @@ class AvatarPresets : Module<AvatarPresetsConfig>() {
         }
         recurseNode(rootNode)
 
-        val gs = Modules.get<GameStorage>("GameStorage")!!
-        config!!.avatars[gs.curAvatarId.value!!]!!.presets[index].parameters = parameters
+        config!!.avatars[CoreModules.GameStorage.curAvatarId.value!!]!!.presets[index].parameters = parameters
         saveConfig()
     }
 
     private fun loadPreset(preset: Preset) {
-        if (Modules.Core.config!!.logs.debug) Napier.d("Loading preset ${preset.name}")
+        if (CoreModules.Core.config!!.logs.debug) Napier.d("Loading preset ${preset.name}")
         for (parameter in preset.parameters) {
             OSCSender.send(OSCMessage(parameter.key, listOf(parameter.value.any())))
         }
@@ -75,9 +74,7 @@ class AvatarPresets : Module<AvatarPresetsConfig>() {
 
     @Composable
     override fun onSettingsUI() {
-        val gs = Modules.get<GameStorage>("GameStorage")!!
-        val curAvatarId by remember { gs.curAvatarId }
-        val curUserId by remember { gs.curUserId }
+        val curAvatarId by remember { CoreModules.GameStorage.curAvatarId }
 
         val saveLoadScope = rememberCoroutineScope()
 

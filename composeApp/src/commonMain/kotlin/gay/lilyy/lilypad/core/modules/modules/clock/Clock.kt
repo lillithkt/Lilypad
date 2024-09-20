@@ -3,7 +3,7 @@ package gay.lilyy.lilypad.core.modules.modules.clock
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import gay.lilyy.lilypad.core.modules.coremodules.chatbox.ChatboxModule
+import gay.lilyy.lilypad.core.CoreModules.Coremodules.chatbox.ChatboxModule
 import kotlinx.serialization.Serializable
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter

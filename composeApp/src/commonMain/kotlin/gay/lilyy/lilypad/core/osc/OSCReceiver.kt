@@ -4,6 +4,7 @@ import com.illposed.osc.MessageSelector
 import com.illposed.osc.OSCMessageEvent
 import com.illposed.osc.OSCMessageListener
 import com.illposed.osc.transport.OSCPortIn
+import gay.lilyy.lilypad.core.modules.CoreModules
 import gay.lilyy.lilypad.core.modules.Modules
 import io.github.aakira.napier.Napier
 
@@ -12,9 +13,9 @@ object OSCReceiver {
 
     val listeners: MutableList<Pair<MessageSelector, OSCMessageListener>> = mutableListOf()
     fun updateAddress() {
-        if (Modules.Core.config!!.logs.debug) Napier.d("Updating OSC receiver address to ${Modules.Core.config!!.listen}")
+        if (CoreModules.Core.config!!.logs.debug) Napier.d("Updating OSC receiver address to ${CoreModules.Core.config!!.listen}")
         receiver?.close()
-        receiver = OSCPortIn(Modules.Core.config!!.listen)
+        receiver = OSCPortIn(CoreModules.Core.config!!.listen)
         for ((selector, listener) in listeners) {
             receiver?.dispatcher?.addListener(selector, listener)
         }
@@ -24,7 +25,7 @@ object OSCReceiver {
     init {
         updateAddress()
         addListener({ true }) {
-            if (Modules.Core.config!!.logs.incomingData) Napier.d("Received message: ${it.message.address} ${it.message.arguments.joinToString()}")
+            if (CoreModules.Core.config!!.logs.incomingData) Napier.d("Received message: ${it.message.address} ${it.message.arguments.joinToString()}")
         }
     }
 

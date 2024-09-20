@@ -1,4 +1,4 @@
-package gay.lilyy.lilypad.core.modules.coremodules.core
+package gay.lilyy.lilypad.core.CoreModules.CoreCoreModules.Core
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

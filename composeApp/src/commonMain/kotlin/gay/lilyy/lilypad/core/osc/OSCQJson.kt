@@ -1,7 +1,8 @@
 package gay.lilyy.lilypad.core.osc
 
 import gay.lilyy.lilypad.core.modules.Modules
-import gay.lilyy.lilypad.core.modules.coremodules.gamestorage.GameStorage
+import gay.lilyy.lilypad.core.CoreModules.Coremodules.gamestorage.GameStorage
+import gay.lilyy.lilypad.core.modules.CoreModules
 import io.github.aakira.napier.Napier
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -125,14 +126,14 @@ data class ParameterNode(
 object OSCQJson {
     private val client: HttpClient = HttpClient(CIO)
     suspend fun getNode(node: String = "/"): ParameterNode? {
-        val (port, address) = if (Modules.Core.config!!.oscQuery && OSCQuery.oscQAddress.value !== null && OSCQuery.oscQPort.value !== null) {
+        val (port, address) = if (CoreModules.Core.config!!.oscQuery && OSCQuery.oscQAddress.value !== null && OSCQuery.oscQPort.value !== null) {
             OSCQuery.oscQPort.value!! to OSCQuery.oscQAddress.value!!
         } else {
             val gs = Modules.get<GameStorage>("GameStorage")
             gs?.oscqPort?.value to "127.0.0.1"
         }
         if (port === null) {
-            if (Modules.Core.config!!.logs.errors) Napier.e("Failed to get node $node: OSCQuery not available")
+            if (CoreModules.Core.config!!.logs.errors) Napier.e("Failed to get node $node: OSCQuery not available")
             return null
         }
         try {
@@ -140,11 +141,11 @@ object OSCQJson {
         if (response.status == HttpStatusCode.OK) {
             return Json.decodeFromString(response.bodyAsText())
         } else {
-            if (Modules.Core.config!!.logs.errors) Napier.e("Failed to get node $node: ${response.status}")
+            if (CoreModules.Core.config!!.logs.errors) Napier.e("Failed to get node $node: ${response.status}")
             return null
         }
         } catch (e: Exception) {
-            if (Modules.Core.config!!.logs.errors) Napier.e("Failed to get node $node: ${e.message}")
+            if (CoreModules.Core.config!!.logs.errors) Napier.e("Failed to get node $node: ${e.message}")
             return null
         }
     }

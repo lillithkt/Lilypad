@@ -9,7 +9,8 @@ import com.adamratzman.spotify.models.CurrentlyPlayingObject
 import gay.lilyy.lilypad.core.Constants
 import gay.lilyy.lilypad.core.HTTPServer
 import gay.lilyy.lilypad.core.modules.Modules
-import gay.lilyy.lilypad.core.modules.coremodules.chatbox.ChatboxModule
+import gay.lilyy.lilypad.core.CoreModules.Coremodules.chatbox.ChatboxModule
+import gay.lilyy.lilypad.core.modules.CoreModules
 import gay.lilyy.lilypad.core.modules.modules.spotify.types.Lyrics
 import gay.lilyy.lilypad.core.modules.modules.spotify.types.SyncType
 import gay.lilyy.lilypad.openUrlInBrowser
@@ -148,7 +149,7 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                 redirectUri = "http://localhost:${Constants.HTTP_PORT}$REDIRECT_URL"
             )
             HTTPServer.lock("spotify")
-            if (Modules.Core.config!!.logs.debug) Napier.d("Opening browser to $url")
+            if (CoreModules.Core.config!!.logs.debug) Napier.d("Opening browser to $url")
             openUrlInBrowser(url)
         } else {
             spotifyClient = null
@@ -167,7 +168,7 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                 try {
                     updateNowPlaying()
                 } catch (e: Exception) {
-                    if (Modules.Core.config!!.logs.errors) Napier.e("Failed to update now playing", e)
+                    if (CoreModules.Core.config!!.logs.errors) Napier.e("Failed to update now playing", e)
                     updateSpotifyClient(true)
                 }
                 Thread.sleep(config!!.updateInterval.toLong())
@@ -223,10 +224,10 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                         nowPlaying = response.body()
                     } catch(e: Exception) {
                         if (e.instanceOf(MissingFieldException::class) || e.instanceOf(JsonConvertException::class)) {
-                            if (Modules.Core.config!!.logs.debug) Napier.d("No song playing")
+                            if (CoreModules.Core.config!!.logs.debug) Napier.d("No song playing")
                             nowPlaying = null
                         } else {
-                            if (Modules.Core.config!!.logs.errors) Napier.e("Failed to get currently playing", e)
+                            if (CoreModules.Core.config!!.logs.errors) Napier.e("Failed to get currently playing", e)
                         }
                     }
                 }
@@ -242,10 +243,10 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                 nowPlaying = spotifyClient!!.player.getCurrentlyPlaying()
                 } catch (e: Exception) {
                     if (e.instanceOf(MissingFieldException::class) || e.instanceOf(JsonConvertException::class)) {
-                        if (Modules.Core.config!!.logs.debug) Napier.d("No song playing")
+                        if (CoreModules.Core.config!!.logs.debug) Napier.d("No song playing")
                         nowPlaying = null
                     } else {
-                        if (Modules.Core.config!!.logs.errors) Napier.e("Failed to get currently playing", e)
+                        if (CoreModules.Core.config!!.logs.errors) Napier.e("Failed to get currently playing", e)
                         updateSpotifyClient(true)
                     }
                 }

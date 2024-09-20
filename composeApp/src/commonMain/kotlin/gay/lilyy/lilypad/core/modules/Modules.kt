@@ -1,7 +1,9 @@
 package gay.lilyy.lilypad.core.modules
 
 import androidx.compose.runtime.Composable
-import gay.lilyy.lilypad.core.modules.coremodules.core.Core
+import gay.lilyy.lilypad.core.CoreModules.Coremodules.chatbox.Chatbox
+import gay.lilyy.lilypad.core.CoreModules.CoreCoreModules.Core.Core
+import gay.lilyy.lilypad.core.CoreModules.Coremodules.gamestorage.GameStorage
 import io.github.aakira.napier.Napier
 import io.ktor.server.routing.*
 import kotlinx.serialization.encodeToString
@@ -41,7 +43,7 @@ abstract class Module<T : Any> {
                 }
             }
         } catch (e: Exception) {
-            if (Modules.Core.config!!.logs.errors) Napier.e("Failed to load config for module $name", e)
+            if (CoreModules.Core.config!!.logs.errors) Napier.e("Failed to load config for module $name", e)
         }
     }
 
@@ -69,11 +71,33 @@ abstract class Module<T : Any> {
         return false
     }
 }
+
+object CoreModules {
+    val Core: Core = Core()
+    val GameStorage: GameStorage = GameStorage()
+    val Chatbox: Chatbox = Chatbox()
+    
+    val all: List<Module<*>> = listOf(
+        Core,
+        GameStorage,
+        Chatbox
+    )
+
+    init {
+        for (module in all) {
+            try {
+                Modules.modules[module.name] = module
+                module.init()
+            } catch (e: Exception) {
+                if (Core.config!!.logs.errors) Napier.e("Failed to init Core Module ${module.name}", e)
+            }
+        }
+    }
+}
+
 object Modules {
     val modules: MutableMap<String, Module<*>> = mutableMapOf("Core" to Core())
     
-    val Core: Core
-        get() = get("Core")!!
 
     inline fun <reified T : Module<*>> get(name: String): T? {
         return modules[name] as T?
@@ -90,25 +114,27 @@ object Modules {
                     continue
                 }
                 val moduleInstance = moduleClass.getDeclaredConstructor().newInstance() as Module
-                if (moduleInstance.name === "Template") continue
-                if (Core.config!!.logs.debug) Napier.v("Registering module ${moduleInstance.name}")
-                modules[moduleInstance.name] = moduleInstance
-                if (!moduleInstance.disabled) moduleInstance.init()
+                if (!moduleInstance.disabled) {
+                    if (CoreModules.Core.config!!.logs.debug) Napier.v("Registering module ${moduleInstance.name}")
+                    moduleInstance.init()
+                    modules[moduleInstance.name] = moduleInstance
+                } else {
+                    if (CoreModules.Core.config!!.logs.debug) Napier.v("Skipping disabled module ${moduleInstance.name}")
+                }
             } catch (e: Exception) {
-                if (Core.config!!.logs.errors) Napier.e("Failed to register module ${moduleClass.simpleName}", e)
+                if (CoreModules.Core.config!!.logs.errors) Napier.e("Failed to register module ${moduleClass.simpleName}", e)
             }
         }
     }
 
     private fun registerModules() {
-        registerModulesFromPackage("gay.lilyy.lilypad.core.modules.coremodules")
-        for (packageName in Core.config!!.modulePackages) {
+        for (packageName in CoreModules.Core.config!!.modulePackages) {
             registerModulesFromPackage(packageName)
         }
     }
 
     init {
-        Core.init()
+        CoreModules.Core.init()
         registerModules()
     }
 }
@@ -126,7 +152,7 @@ object ConfigStorage {
 
     init {
         try {
-            if (Modules.Core.config?.logs?.debug == true) Napier.v("Loading config from ${configFile.absolutePath}")
+            if (CoreModules.Core.config?.logs?.debug == true) Napier.v("Loading config from ${configFile.absolutePath}")
         } catch(e: Exception) {
             /* no-op */
         }
@@ -134,7 +160,7 @@ object ConfigStorage {
             try {
                 jsonEncoder.decodeFromString<MutableMap<String, JsonElement>>(configFile.readText())
             } catch (e: Exception) {
-                if (Modules.Core.config?.logs?.errors == true) Napier.e("Failed loading ${configFile.absolutePath}: ${e.message}", e)
+                if (CoreModules.Core.config?.logs?.errors == true) Napier.e("Failed loading ${configFile.absolutePath}: ${e.message}", e)
                 mutableMapOf()
             }
         } else {
@@ -143,7 +169,7 @@ object ConfigStorage {
     }
 
     fun save() {
-        if (Modules.Core.config?.logs?.debug == true) Napier.v("Saving config to ${configFile.absolutePath}")
+        if (CoreModules.Core.config?.logs?.debug == true) Napier.v("Saving config to ${configFile.absolutePath}")
         configFile.writeText(jsonEncoder.encodeToString(all))
     }
 }

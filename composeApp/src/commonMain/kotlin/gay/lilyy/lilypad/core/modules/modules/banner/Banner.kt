@@ -2,7 +2,7 @@ package gay.lilyy.lilypad.core.modules.modules.banner
 
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import gay.lilyy.lilypad.core.modules.coremodules.chatbox.ChatboxModule
+import gay.lilyy.lilypad.core.CoreModules.Coremodules.chatbox.ChatboxModule
 import kotlinx.serialization.Serializable
 
 @Serializable

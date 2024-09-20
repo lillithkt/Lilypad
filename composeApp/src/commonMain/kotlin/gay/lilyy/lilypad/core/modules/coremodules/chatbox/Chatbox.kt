@@ -1,4 +1,4 @@
-package gay.lilyy.lilypad.core.modules.coremodules.chatbox
+package gay.lilyy.lilypad.core.CoreModules.Coremodules.chatbox
 
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
@@ -6,6 +6,7 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.illposed.osc.OSCMessage
+import gay.lilyy.lilypad.core.modules.CoreModules
 import gay.lilyy.lilypad.core.modules.Modules
 import gay.lilyy.lilypad.core.osc.OSCSender
 import io.github.aakira.napier.Napier
@@ -73,7 +74,7 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
                 if (output != lastOutput) {
                     if (timeoutUp) {
                         val chatbox = output.joinToString("\n")
-                        if (Modules.Core.config!!.logs.outgoingChatbox) Napier.v(chatbox)
+                        if (CoreModules.Core.config!!.logs.outgoingChatbox) Napier.v(chatbox)
                         OSCSender.send(OSCMessage("/chatbox/input", listOf(chatbox, true, false)))
                         val scope = CoroutineScope(Dispatchers.Main)
                         scope.launch {
@@ -92,7 +93,7 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
 
     fun clearChatbox(onlyIfDisabled: Boolean = false) {
         if (onlyIfDisabled && config!!.enabled) return
-        if (Modules.Core.config!!.logs.outgoingChatbox) Napier.v("Clearing chatbox")
+        if (CoreModules.Core.config!!.logs.outgoingChatbox) Napier.v("Clearing chatbox")
         OSCSender.send(
             OSCMessage(
                 "/chatbox/input", listOf(

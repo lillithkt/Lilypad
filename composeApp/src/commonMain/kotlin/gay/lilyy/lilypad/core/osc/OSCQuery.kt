@@ -7,6 +7,7 @@ import dev.slimevr.oscquery.OSCQueryServer
 import dev.slimevr.oscquery.OscTransport
 import dev.slimevr.oscquery.randomFreePort
 import gay.lilyy.lilypad.core.Utils
+import gay.lilyy.lilypad.core.modules.CoreModules
 import gay.lilyy.lilypad.core.modules.Modules
 import io.github.aakira.napier.Napier
 
@@ -21,18 +22,18 @@ object OSCQuery {
     var oscQAddress: MutableState<String?> = mutableStateOf(null)
 
     fun update() {
-        if (!Modules.Core.config!!.oscQuery) {
+        if (!CoreModules.Core.config!!.oscQuery) {
             server.close()
             return
         }
-        if (Modules.Core.config!!.logs.debug) Napier.d("Updating OSCQuery address to ${Modules.Core.config!!.listen}")
-        server.updateOscService(Modules.Core.config!!.listen.toUShort())
+        if (CoreModules.Core.config!!.logs.debug) Napier.d("Updating OSCQuery address to ${CoreModules.Core.config!!.listen}")
+        server.updateOscService(CoreModules.Core.config!!.listen.toUShort())
     }
 
     init {
         System.setProperty("java.net.preferIPv4Stack", "true") // https://github.com/jmdns/jmdns/issues/244
         val httpPort = randomFreePort()
-        server = OSCQueryServer("Lilypad", OscTransport.UDP, Utils.getLocalIp(), Modules.Core.config!!.listen.toUShort(), httpPort)
+        server = OSCQueryServer("Lilypad", OscTransport.UDP, Utils.getLocalIp(), CoreModules.Core.config!!.listen.toUShort(), httpPort)
         server.rootNode.addNode(OSCQueryNode("/avatar"))
 
 
@@ -43,14 +44,14 @@ object OSCQuery {
                 if (!it.name.startsWith(vrcOSCStartsWith)) return@addServiceListener
                 oscAddress.value = it.inetAddresses.first().hostAddress
                 oscPort.value = it.port
-                if (Modules.Core.config!!.logs.debug) Napier.d("Found VRChat client OSC at $oscAddress:$oscPort")
+                if (CoreModules.Core.config!!.logs.debug) Napier.d("Found VRChat client OSC at $oscAddress:$oscPort")
                 OSCSender.updateAddress()
             },
             onServiceRemoved = { _, name ->
                 if (!name.startsWith(vrcOSCStartsWith)) return@addServiceListener
                 oscAddress.value = null
                 oscPort.value = null
-                if (Modules.Core.config!!.logs.debug) Napier.d("Lost VRChat client OSC")
+                if (CoreModules.Core.config!!.logs.debug) Napier.d("Lost VRChat client OSC")
                 OSCSender.updateAddress()
             }
         )
@@ -62,13 +63,13 @@ object OSCQuery {
                 if (!it.name.startsWith(vrcOSCStartsWith)) return@addServiceListener
                 oscQAddress.value = it.inetAddresses.first().hostAddress
                 oscQPort.value = it.port
-                if (Modules.Core.config!!.logs.debug) Napier.d("Found VRChat client OSCQJson at $oscQAddress:$oscQPort")
+                if (CoreModules.Core.config!!.logs.debug) Napier.d("Found VRChat client OSCQJson at $oscQAddress:$oscQPort")
             },
             onServiceRemoved = { _, name ->
                 if (!name.startsWith(vrcOSCStartsWith)) return@addServiceListener
                 oscQAddress.value = null
                 oscQPort.value = null
-                if (Modules.Core.config!!.logs.debug) Napier.d("Lost VRChat client OSCQJson")
+                if (CoreModules.Core.config!!.logs.debug) Napier.d("Lost VRChat client OSCQJson")
             }
         )
 

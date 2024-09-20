@@ -1,5 +1,6 @@
 package gay.lilyy.lilypad.core
 
+import gay.lilyy.lilypad.core.modules.CoreModules
 import gay.lilyy.lilypad.core.modules.Modules
 import io.github.aakira.napier.Napier
 import io.ktor.server.routing.*
@@ -13,7 +14,7 @@ object HTTPServer {
         routing {
             for (module in Modules.modules.values) {
                 if (module.httpServerRouting(this)) {
-                    if (Modules.Core.config!!.logs.debug) Napier.d("Registered routing for module ${module.name}")
+                    if (CoreModules.Core.config!!.logs.debug) Napier.d("Registered routing for module ${module.name}")
                 }
             }
         }

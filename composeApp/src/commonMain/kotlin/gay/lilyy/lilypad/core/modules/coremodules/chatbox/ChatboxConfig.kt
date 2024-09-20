@@ -1,4 +1,4 @@
-package gay.lilyy.lilypad.core.modules.coremodules.chatbox
+package gay.lilyy.lilypad.core.CoreModules.Coremodules.chatbox
 
 import gay.lilyy.lilypad.core.modules.modules.spotify.SpotifyConfig
 import kotlinx.serialization.SerialName

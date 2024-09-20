@@ -6,23 +6,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import gay.lilyy.lilypad.core.modules.Modules
-import gay.lilyy.lilypad.core.modules.coremodules.chatbox.Chatbox
+import gay.lilyy.lilypad.core.CoreModules.Coremodules.chatbox.Chatbox
+import gay.lilyy.lilypad.core.modules.CoreModules
 import io.github.aakira.napier.Napier
 
 @Composable
 fun CurrentChatbox() {
-    val chatboxModule = Modules.get<Chatbox>("Chatbox")
-    if (chatboxModule == null) {
-        Napier.e("Chatbox module not found")
-        Text("Chatbox module not found", color = MaterialTheme.colors.error, style = MaterialTheme.typography.h6)
-        return
-    }
-
     var chatboxText by remember { mutableStateOf("") }
 
-    LaunchedEffect(chatboxModule.lastOutput) {
-        snapshotFlow { chatboxModule.lastOutput.toList() }
-            .collect { output ->
+    LaunchedEffect(CoreModules.Chatbox.lastOutput) {
+                snapshotFlow { CoreModules.Chatbox.lastOutput.toList() }
+                    .collect { output ->
                 chatboxText = output.filterNotNull().joinToString("\n")
             }
     }

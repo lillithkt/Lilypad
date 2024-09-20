@@ -1,7 +1,8 @@
-package gay.lilyy.lilypad.core.modules.coremodules.gamestorage
+package gay.lilyy.lilypad.core.CoreModules.Coremodules.gamestorage
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import gay.lilyy.lilypad.core.modules.CoreModules
 import gay.lilyy.lilypad.core.modules.Module
 import gay.lilyy.lilypad.core.modules.Modules
 import gay.lilyy.lilypad.core.osc.OSCQJson
@@ -88,7 +89,6 @@ class GameStorage : Module<Any>() {
     }
 
     private suspend fun getCurAvatarId(): String? {
-        println("getCurAvatarId")
         return OSCQJson.getNode("/avatar/change")?.let {
             curAvatarId.value = it.value?.first()?.string
             curAvatarId.value
@@ -99,7 +99,7 @@ class GameStorage : Module<Any>() {
         super.init()
         val scope = CoroutineScope(Dispatchers.IO)
         if (!getPlatform().name.contains("Java")) {
-            if (Modules.Core.config!!.logs.debug) Napier.v("Running on android, log scanning disabled")
+            if (CoreModules.Core.config!!.logs.debug) Napier.v("Running on android, log scanning disabled")
         } else {
             if (vrcAppdataPath.exists()) {
                 vrcInstalled = true
