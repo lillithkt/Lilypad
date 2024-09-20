@@ -7,3 +7,4 @@ interface Platform {
 expect fun getPlatform(): Platform
 
 expect fun openUrlInBrowser(url: String)
+expect fun getFilesDir(): String

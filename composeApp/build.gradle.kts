@@ -61,7 +61,6 @@ kotlin {
             implementation(libs.kfswatch)
 
             implementation(kotlin("reflect"))
-            implementation(libs.reflections)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

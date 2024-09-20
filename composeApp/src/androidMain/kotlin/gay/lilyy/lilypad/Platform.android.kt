@@ -15,3 +15,7 @@ actual fun openUrlInBrowser(url: String) {
     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
     Shared.context?.startActivity(intent)
 }
+
+actual fun getFilesDir(): String {
+    return Shared.context?.filesDir?.absolutePath ?: ""
+}
