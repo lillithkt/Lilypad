@@ -42,7 +42,13 @@ fun App() {
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Lilypad", style = MaterialTheme.typography.h3)
-            val curUsername by remember { CoreModules.GameStorage.curUsername }
+            var curUsername by remember { mutableStateOf<String?>(null) }
+            LaunchedEffect(CoreModules.GameStorage.curUsername) {
+                snapshotFlow { CoreModules.GameStorage.curUsername.value }
+                    .collect { username ->
+                        curUsername = username
+                    }
+            }
             if (curUsername != null) {
                 Text("Welcome, $curUsername", style = MaterialTheme.typography.h6)
             }

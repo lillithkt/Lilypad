@@ -7,8 +7,6 @@ My custom osc client and chatbox!
 - Highly Customizable
 - Supports OSCQuery, so you can run this on separate hardware!
 - A lock-based HTTP Server, for oAuth!
-- Runs on android hardware, for standalone users!
-- - This is untested! Please [Open An Issue](https://github.com/imlvna/Lilypad/issues/new) if you have any issues!
 
 ### Modules
 #### Core (Required for use)
@@ -28,3 +26,8 @@ My custom osc client and chatbox!
 - - Adds a now playing integration, which supports time-synced lyrics!
 - Clock
 - - Adds a clock to the chatbox
+
+
+## To-Do
+- [ ] Run on android hardware
+- - Currently, there is an [Issue](https://github.com/hoijui/JavaOSC/issues/75) with JavaOSC, which does not let us run on android yet

@@ -84,10 +84,13 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+
+        manifestPlaceholders["redirectHostName"] = "com.lilyy.lilypad"
+        manifestPlaceholders["redirectSchemeName"] = "lilypad"
     }
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes.add("META-INF/*")
         }
     }
     buildTypes {
