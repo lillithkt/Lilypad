@@ -7,6 +7,7 @@ My custom osc client and chatbox!
 - Highly Customizable
 - Supports OSCQuery, so you can run this on separate hardware!
 - A lock-based HTTP Server, for oAuth!
+- Runs on Quest Standalone! (Or anything android)
 
 ### Modules
 #### Core (Required for use)
@@ -29,5 +30,5 @@ My custom osc client and chatbox!
 
 
 ## To-Do
-- [ ] Run on android hardware
-- - Currently, there is an [Issue](https://github.com/hoijui/JavaOSC/issues/75) with JavaOSC, which does not let us run on android yet
+- [X] Run on android hardware
+- - ~~Currently, there is an [Issue](https://github.com/hoijui/JavaOSC/issues/75) with JavaOSC, which does not let us run on android yet~~

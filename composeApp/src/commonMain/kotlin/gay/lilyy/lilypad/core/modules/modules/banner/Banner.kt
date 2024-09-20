@@ -140,6 +140,7 @@ class Banner : ChatboxModule<BannerConfig>() {
     override fun buildChatbox(): List<String> {
         if (!config!!.enabled) return emptyList()
         val possibleMessages = config!!.sets.filter { it.enabled }.flatMap { it.messages }
+        if (possibleMessages.isEmpty()) return emptyList()
         return listOf(possibleMessages[random % possibleMessages.size])
     }
 
