@@ -4,12 +4,14 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import gay.lilyy.lilypad.core.modules.Module
 import gay.lilyy.lilypad.core.modules.Modules
+import gay.lilyy.lilypad.core.osc.OSCQJson
 import gay.lilyy.lilypad.getPlatform
 import io.github.aakira.napier.Napier
 import io.github.irgaly.kfswatch.KfsDirectoryWatcher
 import io.github.irgaly.kfswatch.KfsEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 @Suppress("Unused")
@@ -85,19 +87,37 @@ class GameStorage : Module<Any>() {
         }
     }
 
+    private suspend fun getCurAvatarId(): String? {
+        println("getCurAvatarId")
+        return OSCQJson.getNode("/avatar/change")?.let {
+            curAvatarId.value = it.value?.first()?.string
+            curAvatarId.value
+        }
+    }
+
     override fun init() {
         super.init()
+        val scope = CoroutineScope(Dispatchers.IO)
         if (!getPlatform().name.contains("Java")) {
             if (Modules.Core.config!!.logs.debug) Napier.v("Running on android, log scanning disabled")
         } else {
             if (vrcAppdataPath.exists()) {
                 vrcInstalled = true
                 updateLogFile()
-                val scope = CoroutineScope(Dispatchers.IO)
+
                 val watcher = KfsDirectoryWatcher(scope)
                 scope.launch {
                     watchLogs(watcher)
                 }
+            }
+
+
+        }
+
+        scope.launch {
+            while (true) {
+                getCurAvatarId()
+                delay(5000)
             }
         }
     }

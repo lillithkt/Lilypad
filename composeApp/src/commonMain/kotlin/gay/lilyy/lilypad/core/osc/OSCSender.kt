@@ -11,8 +11,8 @@ object OSCSender {
     lateinit var sender: OSCPortOut
 
     fun updateAddress() {
-        val port = OSCQuery.port.value ?: Modules.Core.config!!.connect.split(":")[1].toInt()
-        val address = OSCQuery.address.value ?: Modules.Core.config!!.connect.split(":")[0]
+        val port = OSCQuery.oscPort.value ?: Modules.Core.config!!.connect.split(":")[1].toInt()
+        val address = OSCQuery.oscAddress.value ?: Modules.Core.config!!.connect.split(":")[0]
         if (Modules.Core.config!!.logs.debug) Napier.d("Updating OSC sender address to $address:$port")
         sender = OSCPortOut(InetAddress.getByName(address), port)
     }

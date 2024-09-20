@@ -28,7 +28,7 @@ data class Avatar(
 
 @Serializable
 data class AvatarPresetsConfig(
-    val users: MutableMap<String, MutableMap<String, Avatar>> = mutableMapOf()
+    val avatars: MutableMap<String, Avatar> = mutableMapOf()
 )
 
 @Suppress("unused")
@@ -62,7 +62,7 @@ class AvatarPresets : Module<AvatarPresetsConfig>() {
         recurseNode(rootNode)
 
         val gs = Modules.get<GameStorage>("GameStorage")!!
-        config!!.users[gs.curUserId.value!!]!![gs.curAvatarId.value!!]!!.presets[index].parameters = parameters
+        config!!.avatars[gs.curAvatarId.value!!]!!.presets[index].parameters = parameters
         saveConfig()
     }
 
@@ -81,14 +81,6 @@ class AvatarPresets : Module<AvatarPresetsConfig>() {
 
         val saveLoadScope = rememberCoroutineScope()
 
-        if (curUserId === null) {
-            Text(
-                "Please log in to VRChat to use Avatar Presets",
-                color = MaterialTheme.colors.error,
-                style = MaterialTheme.typography.h6
-            )
-            return
-        }
         if (curAvatarId === null) {
             Text(
                 "Loading your avatar...",
@@ -97,28 +89,24 @@ class AvatarPresets : Module<AvatarPresetsConfig>() {
             )
             return
         }
-        if (config!!.users[curUserId] === null) {
-            config!!.users[curUserId!!] = mutableMapOf()
+
+        if (config!!.avatars[curAvatarId] === null) {
+            config!!.avatars[curAvatarId!!] = Avatar(curAvatarId!!)
         }
 
-        val user = config!!.users[curUserId!!]!!
-        if (user[curAvatarId] === null) {
-            user[curAvatarId!!] = Avatar(curAvatarId!!)
-        }
-
-        var curAvatarName by remember { mutableStateOf(user[curAvatarId]!!.name) }
+        var curAvatarName by remember { mutableStateOf(config!!.avatars[curAvatarId]!!.name) }
 
         TextField(
             value = curAvatarName,
             onValueChange = {
-                user[curAvatarId]!!.name = it
+                config!!.avatars[curAvatarId]!!.name = it
                 curAvatarName = it
                 saveConfig()
             },
             label = { Text("Avatar Name") }
         )
 
-        val presets = user[curAvatarId]!!.presets.toMutableStateList()
+        val presets = config!!.avatars[curAvatarId]!!.presets.toMutableStateList()
 
         for (preset in presets) {
             var presetName by remember { mutableStateOf(preset.name) }
@@ -134,7 +122,7 @@ class AvatarPresets : Module<AvatarPresetsConfig>() {
                     onValueChange = {
                         presetName = it
                         preset.name = it
-                        config!!.users[curUserId]!![curAvatarId]!!.presets[presets.indexOf(preset)].name = it
+                        config!!.avatars[curAvatarId]!!.presets[presets.indexOf(preset)].name = it
                         saveConfig()
                     },
                     label = { Text("Preset Name") }
@@ -143,7 +131,7 @@ class AvatarPresets : Module<AvatarPresetsConfig>() {
                 Button(
                     onClick = {
                         saveLoadScope.launch {
-                            savePreset(config!!.users[curUserId]!![curAvatarId]!!.presets.indexOf(preset))
+                            savePreset(config!!.avatars[curAvatarId]!!.presets.indexOf(preset))
                         }
                     }
                 ) {
@@ -163,7 +151,7 @@ class AvatarPresets : Module<AvatarPresetsConfig>() {
                 Button(
                     onClick = {
                         presets.remove(preset)
-                        config!!.users[curUserId]!![curAvatarId]!!.presets.remove(preset)
+                        config!!.avatars[curAvatarId]!!.presets.remove(preset)
                         saveConfig()
                     }
                 ) {
@@ -176,7 +164,7 @@ class AvatarPresets : Module<AvatarPresetsConfig>() {
             onClick =
             {
                 val preset = Preset("Preset ${presets.size + 1}")
-                user[curAvatarId]!!.presets.add(preset)
+                config!!.avatars[curAvatarId]!!.presets.add(preset)
                 presets.add(preset)
                 saveConfig()
                 saveLoadScope.launch {

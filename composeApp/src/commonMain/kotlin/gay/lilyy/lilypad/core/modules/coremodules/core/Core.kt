@@ -22,8 +22,8 @@ class Core : Module<CoreConfig>() {
         var listenPort by remember { mutableStateOf(config!!.listen) }
         var connectAddress by remember { mutableStateOf(config!!.connect) }
 
-        val oscQAddress by remember { OSCQuery.address }
-        val oscQPort by remember { OSCQuery.port }
+        val oscQAddress by remember { OSCQuery.oscAddress }
+        val oscQPort by remember { OSCQuery.oscPort }
 
         TextField(
             value = listenPort.toString(),

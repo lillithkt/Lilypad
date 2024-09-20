@@ -125,16 +125,26 @@ data class ParameterNode(
 object OSCQJson {
     private val client: HttpClient = HttpClient(CIO)
     suspend fun getNode(node: String = "/"): ParameterNode? {
-        val gs = Modules.get<GameStorage>("GameStorage")
-        if (gs?.oscqPort?.value == null) {
-            if (Modules.Core.config!!.logs.errors) Napier.e("GameStorage is null or oscq port not found. Is the game running?")
+        val (port, address) = if (Modules.Core.config!!.oscQuery && OSCQuery.oscQAddress.value !== null && OSCQuery.oscQPort.value !== null) {
+            OSCQuery.oscQPort.value!! to OSCQuery.oscQAddress.value!!
+        } else {
+            val gs = Modules.get<GameStorage>("GameStorage")
+            gs?.oscqPort?.value to "127.0.0.1"
+        }
+        if (port === null) {
+            if (Modules.Core.config!!.logs.errors) Napier.e("Failed to get node $node: OSCQuery not available")
             return null
         }
-        val response = client.get("http://127.0.0.1:${gs.oscqPort.value}$node")
+        try {
+        val response = client.get("http://$address:$port$node")
         if (response.status == HttpStatusCode.OK) {
             return Json.decodeFromString(response.bodyAsText())
         } else {
             if (Modules.Core.config!!.logs.errors) Napier.e("Failed to get node $node: ${response.status}")
+            return null
+        }
+        } catch (e: Exception) {
+            if (Modules.Core.config!!.logs.errors) Napier.e("Failed to get node $node: ${e.message}")
             return null
         }
     }
