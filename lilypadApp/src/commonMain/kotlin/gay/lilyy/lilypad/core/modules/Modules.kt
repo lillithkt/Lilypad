@@ -8,6 +8,7 @@ import gay.lilyy.lilypad.core.modules.modules.avatarpresets.AvatarPresets
 import gay.lilyy.lilypad.core.modules.modules.banner.Banner
 import gay.lilyy.lilypad.core.modules.modules.clock.Clock
 import gay.lilyy.lilypad.core.modules.modules.spotify.Spotify
+import gay.lilyy.lilypad.core.modules.modules.template.FullbodySlide
 import gay.lilyy.lilypad.getFilesDir
 import io.github.aakira.napier.Napier
 import io.ktor.server.routing.*
@@ -100,7 +101,8 @@ object Modules {
         AvatarPresets(),
         Banner(),
         Clock(),
-        Spotify()
+        Spotify(),
+        FullbodySlide()
     ).associateBy { it.name }.toMutableMap()
 
 
