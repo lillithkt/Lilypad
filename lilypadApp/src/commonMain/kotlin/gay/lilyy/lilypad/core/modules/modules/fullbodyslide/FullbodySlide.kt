@@ -1,6 +1,5 @@
 package gay.lilyy.lilypad.core.modules.modules.template
 
-import androidx.compose.material.Checkbox
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -9,6 +8,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.illposed.osc.OSCMessage
 import gay.lilyy.lilypad.core.modules.Module
 import gay.lilyy.lilypad.core.osc.OSCSender
+import gay.lilyy.lilypad.ui.components.LabeledCheckbox
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -17,19 +17,26 @@ data class FullbodySlideConfig(
 )
 
 @Suppress("unused")
-class FullbodySlide : Module<TemplateConfig>() {
+class FullbodySlide : Module<FullbodySlideConfig>() {
     override val name = "Fullbody Slide"
 
-    override val configClass = TemplateConfig::class
+    override val configClass = FullbodySlideConfig::class
 
     override val hasSettingsUI = true
+
     @Composable
     override fun onSettingsUI() {
-        Text("This module gives you fake trackers that allow you to do the fullbody slide", style = TextStyle(textAlign = TextAlign.Center))
-        Text("(Please dont use this it looks so stupid, i added this as a joke)", style = MaterialTheme.typography.caption.merge(TextStyle(textAlign = TextAlign.Center)))
+        Text(
+            "This module gives you fake trackers that allow you to do the fullbody slide",
+            style = TextStyle(textAlign = TextAlign.Center)
+        )
+        Text(
+            "(Please dont use this it looks so stupid, i added this as a joke)",
+            style = MaterialTheme.typography.caption.merge(TextStyle(textAlign = TextAlign.Center))
+        )
         var enabled by remember { mutableStateOf(config!!.enabled) }
-        Text("Enabled")
-        Checkbox(
+        LabeledCheckbox(
+            label = "Enabled",
             checked = enabled,
             onCheckedChange = {
                 enabled = it

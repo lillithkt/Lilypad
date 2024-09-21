@@ -27,6 +27,7 @@ enum class Access(val int: Int) {
     WRITE(2),
     READ_WRITE(3)
 }
+
 // Serializer for Access enum
 object AccessSerializer : KSerializer<Access> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Access", PrimitiveKind.INT)
@@ -69,6 +70,7 @@ data class Parameter(
             ParameterType.STRING -> string.toString()
         }
     }
+
     fun any(): Any {
         return when (type) {
             ParameterType.INT -> int!!
@@ -88,7 +90,9 @@ object ParameterSerializer : KSerializer<Parameter> {
             ParameterType.INT -> encoder.encodeInt(value.int ?: throw SerializationException("Expected int"))
             ParameterType.BOOL -> encoder.encodeBoolean(value.bool ?: throw SerializationException("Expected bool"))
             ParameterType.FLOAT -> encoder.encodeFloat(value.float ?: throw SerializationException("Expected float"))
-            ParameterType.STRING -> encoder.encodeString(value.string ?: throw SerializationException("Expected string"))
+            ParameterType.STRING -> encoder.encodeString(
+                value.string ?: throw SerializationException("Expected string")
+            )
         }
     }
 
@@ -137,13 +141,13 @@ object OSCQJson {
             return null
         }
         try {
-        val response = client.get("http://$address:$port$node")
-        if (response.status == HttpStatusCode.OK) {
-            return Json.decodeFromString(response.bodyAsText())
-        } else {
-            if (CoreModules.Core.config!!.logs.errors) Napier.e("Failed to get node $node: ${response.status}")
-            return null
-        }
+            val response = client.get("http://$address:$port$node")
+            if (response.status == HttpStatusCode.OK) {
+                return Json.decodeFromString(response.bodyAsText())
+            } else {
+                if (CoreModules.Core.config!!.logs.errors) Napier.e("Failed to get node $node: ${response.status}")
+                return null
+            }
         } catch (e: Exception) {
             if (CoreModules.Core.config!!.logs.errors) Napier.e("Failed to get node $node: ${e.message}")
             return null

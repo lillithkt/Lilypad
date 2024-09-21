@@ -1,10 +1,13 @@
 package gay.lilyy.lilypad.core.CoreModules.CoreCoreModules.Core
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Button
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import gay.lilyy.lilypad.core.modules.Module
 import gay.lilyy.lilypad.core.osc.OSCQuery
 import gay.lilyy.lilypad.core.osc.OSCReceiver
@@ -41,7 +44,8 @@ class Core : Module<CoreConfig>() {
         }
         TextField(
             value = if (oscQAddress != null && oscQPort != null) "${oscQAddress}:${oscQPort}" else connectAddress,
-            onValueChange = { connectAddress = it
+            onValueChange = {
+                connectAddress = it
                 validateConnectAddress()
             },
             enabled = oscQAddress == null && oscQPort == null,
@@ -63,67 +67,69 @@ class Core : Module<CoreConfig>() {
         Button(onClick = { logsOpen = !logsOpen }) {
             Text("Logs")
         }
-        if (logsOpen) {
-            var outgoingChatbox by remember { mutableStateOf(config!!.logs.outgoingChatbox) }
-            Text("Outgoing chatbox")
-            Checkbox(
-                checked = outgoingChatbox,
-                onCheckedChange = {
-                    outgoingChatbox = it
-                    config!!.logs.outgoingChatbox = it
-                    saveConfig()
-                }
-            )
-            var incomingOSC by remember { mutableStateOf(config!!.logs.incomingData) }
-            Text("Incoming OSC")
-            Checkbox(
-                checked = incomingOSC,
-                onCheckedChange = {
-                    incomingOSC = it
-                    config!!.logs.incomingData = it
-                    saveConfig()
-                }
-            )
-            var outgoingOSC by remember { mutableStateOf(config!!.logs.outgoingData) }
-            Text("Outgoing OSC")
-            Checkbox(
-                checked = outgoingOSC,
-                onCheckedChange = {
-                    outgoingOSC = it
-                    config!!.logs.outgoingData = it
-                    saveConfig()
-                }
-            )
-            var errors by remember { mutableStateOf(config!!.logs.errors) }
-            Text("Errors")
-            Checkbox(
-                checked = errors,
-                onCheckedChange = {
-                    errors = it
-                    config!!.logs.errors = it
-                    saveConfig()
-                }
-            )
-            var warnings by remember { mutableStateOf(config!!.logs.warnings) }
-            Text("Warnings")
-            Checkbox(
-                checked = warnings,
-                onCheckedChange = {
-                    warnings = it
-                    config!!.logs.warnings = it
-                    saveConfig()
-                }
-            )
-            var debug by remember { mutableStateOf(config!!.logs.debug) }
-            Text("Debug")
-            Checkbox(
-                checked = debug,
-                onCheckedChange = {
-                    debug = it
-                    config!!.logs.debug = it
-                    saveConfig()
-                }
-            )
+        AnimatedVisibility(visible = logsOpen) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                var outgoingChatbox by remember { mutableStateOf(config!!.logs.outgoingChatbox) }
+                Text("Outgoing chatbox")
+                Checkbox(
+                    checked = outgoingChatbox,
+                    onCheckedChange = {
+                        outgoingChatbox = it
+                        config!!.logs.outgoingChatbox = it
+                        saveConfig()
+                    }
+                )
+                var incomingOSC by remember { mutableStateOf(config!!.logs.incomingData) }
+                Text("Incoming OSC")
+                Checkbox(
+                    checked = incomingOSC,
+                    onCheckedChange = {
+                        incomingOSC = it
+                        config!!.logs.incomingData = it
+                        saveConfig()
+                    }
+                )
+                var outgoingOSC by remember { mutableStateOf(config!!.logs.outgoingData) }
+                Text("Outgoing OSC")
+                Checkbox(
+                    checked = outgoingOSC,
+                    onCheckedChange = {
+                        outgoingOSC = it
+                        config!!.logs.outgoingData = it
+                        saveConfig()
+                    }
+                )
+                var errors by remember { mutableStateOf(config!!.logs.errors) }
+                Text("Errors")
+                Checkbox(
+                    checked = errors,
+                    onCheckedChange = {
+                        errors = it
+                        config!!.logs.errors = it
+                        saveConfig()
+                    }
+                )
+                var warnings by remember { mutableStateOf(config!!.logs.warnings) }
+                Text("Warnings")
+                Checkbox(
+                    checked = warnings,
+                    onCheckedChange = {
+                        warnings = it
+                        config!!.logs.warnings = it
+                        saveConfig()
+                    }
+                )
+                var debug by remember { mutableStateOf(config!!.logs.debug) }
+                Text("Debug")
+                Checkbox(
+                    checked = debug,
+                    onCheckedChange = {
+                        debug = it
+                        config!!.logs.debug = it
+                        saveConfig()
+                    }
+                )
+            }
         }
     }
 }

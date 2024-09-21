@@ -4,7 +4,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import gay.lilyy.lilypad.core.modules.CoreModules
 import gay.lilyy.lilypad.core.modules.Module
-import gay.lilyy.lilypad.core.modules.Modules
 import gay.lilyy.lilypad.core.osc.OSCQJson
 import gay.lilyy.lilypad.getPlatform
 import io.github.aakira.napier.Napier
@@ -15,11 +14,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
+
 @Suppress("Unused")
 class GameStorage : Module<Any>() {
     override val name = "GameStorage"
 
     var vrcInstalled: Boolean = false
+
     // C:\Users\lillith\AppData\LocalLow\VRChat\VRChat
     var vrcAppdataPath: File = File(System.getenv("APPDATA"), "../LocalLow/VRChat/VRChat")
 
@@ -54,7 +55,11 @@ class GameStorage : Module<Any>() {
             file.name.endsWith(".txt") && file.name.startsWith("output_log_")
         }
 
-        val last = logs.sorted().last()
+        val last = logs?.maxOf { it }
+        if (last == null) {
+            if (CoreModules.Core.config!!.logs.errors) Napier.e("No log files found")
+            return
+        }
         val diffFile = curLogFile?.name !== last.name
         curLogFile = last
         if (diffFile) {
@@ -71,6 +76,7 @@ class GameStorage : Module<Any>() {
                         updateLogFile()
                     }
                 }
+
                 KfsEvent.Modify -> {
                     if (event.path == curLogFile?.name) {
                         var i = 0
@@ -83,6 +89,7 @@ class GameStorage : Module<Any>() {
                         }
                     }
                 }
+
                 else -> {}
             }
         }

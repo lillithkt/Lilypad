@@ -21,7 +21,7 @@ import java.io.File
 import java.util.*
 import kotlin.reflect.KClass
 
-@OptIn(kotlinx. serialization. InternalSerializationApi::class)
+@OptIn(kotlinx.serialization.InternalSerializationApi::class)
 abstract class Module<T : Any> {
     abstract val name: String
 
@@ -55,12 +55,14 @@ abstract class Module<T : Any> {
 
     open fun saveConfig(write: Boolean = true) {
         if (config != null) {
-            ConfigStorage.all[configName!!] = ConfigStorage.jsonEncoder.encodeToJsonElement(configClass!!.serializer(), config!!)
+            ConfigStorage.all[configName!!] =
+                ConfigStorage.jsonEncoder.encodeToJsonElement(configClass!!.serializer(), config!!)
             if (write) {
                 ConfigStorage.save()
             }
         }
     }
+
     /**
      * Whether this module has a settings UI.
      */
@@ -70,7 +72,8 @@ abstract class Module<T : Any> {
      * Called to build the settings UI.
      */
     @Composable
-    open fun onSettingsUI() {}
+    open fun onSettingsUI() {
+    }
 
     // --- HTTP Server ---
     open fun httpServerRouting(routing: Routing): Boolean {
@@ -140,14 +143,17 @@ object ConfigStorage {
     init {
         try {
             if (CoreModules.Core.config?.logs?.debug == true) Napier.v("Loading config from ${configFile.absolutePath}")
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             /* no-op */
         }
         all = if (configFile.exists()) {
             try {
                 jsonEncoder.decodeFromString<MutableMap<String, JsonElement>>(configFile.readText())
             } catch (e: Exception) {
-                if (CoreModules.Core.config?.logs?.errors == true) Napier.e("Failed loading ${configFile.absolutePath}: ${e.message}", e)
+                if (CoreModules.Core.config?.logs?.errors == true) Napier.e(
+                    "Failed loading ${configFile.absolutePath}: ${e.message}",
+                    e
+                )
                 mutableMapOf()
             }
         } else {

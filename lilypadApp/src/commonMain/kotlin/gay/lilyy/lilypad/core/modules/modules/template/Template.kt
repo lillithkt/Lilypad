@@ -1,9 +1,8 @@
 package gay.lilyy.lilypad.core.modules.modules.template
 
-import androidx.compose.material.Checkbox
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import gay.lilyy.lilypad.core.modules.Module
+import gay.lilyy.lilypad.ui.components.LabeledCheckbox
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -19,11 +18,12 @@ class Template : Module<TemplateConfig>() {
     override val configClass = TemplateConfig::class
 
     override val hasSettingsUI = true
+
     @Composable
     override fun onSettingsUI() {
         var enabled by remember { mutableStateOf(config!!.enabled) }
-        Text("Enabled")
-        Checkbox(
+        LabeledCheckbox(
+            label = "Enabled",
             checked = enabled,
             onCheckedChange = {
                 enabled = it

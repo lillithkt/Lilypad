@@ -1,13 +1,24 @@
 package gay.lilyy.lilypad.core.modules.modules.avatarpresets
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
 import com.illposed.osc.OSCMessage
 import gay.lilyy.lilypad.core.modules.Module
-import gay.lilyy.lilypad.core.modules.Modules
 import gay.lilyy.lilypad.core.modules.CoreModules
 import gay.lilyy.lilypad.core.osc.*
 import io.github.aakira.napier.Napier
@@ -108,51 +119,70 @@ class AvatarPresets : Module<AvatarPresetsConfig>() {
         for (preset in presets) {
             var presetName by remember { mutableStateOf(preset.name) }
             var enabled by remember { mutableStateOf(false) }
+
             Button(
                 onClick = { enabled = !enabled }
             ) {
                 Text(presetName)
             }
-            if (enabled) {
-                TextField(
-                    value = presetName,
-                    onValueChange = {
-                        presetName = it
-                        preset.name = it
-                        config!!.avatars[curAvatarId]!!.presets[presets.indexOf(preset)].name = it
-                        saveConfig()
-                    },
-                    label = { Text("Preset Name") }
-                )
+            AnimatedVisibility(visible = enabled) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .clip(RoundedCornerShape(5.dp))
+                        .background(MaterialTheme.colors.background) // TODO: custom color for secondary background
+                        .border(1.dp, MaterialTheme.colors.onPrimary, shape = RoundedCornerShape(5.dp))
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Button(
+                            onClick = { enabled = !enabled }
+                        ) {
+                            Text(presetName)
+                        }
+                        TextField(
+                            value = presetName,
+                            onValueChange = {
+                                presetName = it
+                                preset.name = it
+                                config!!.avatars[curAvatarId]!!.presets[presets.indexOf(preset)].name = it
+                                saveConfig()
+                            },
+                            label = { Text("Preset Name") }
+                        )
 
-                Button(
-                    onClick = {
-                        saveLoadScope.launch {
-                            savePreset(config!!.avatars[curAvatarId]!!.presets.indexOf(preset))
+                        Button(
+                            onClick = {
+                                saveLoadScope.launch {
+                                    savePreset(config!!.avatars[curAvatarId]!!.presets.indexOf(preset))
+                                }
+                            }
+                        ) {
+                            Text("Save Preset")
+                        }
+
+                        Button(
+                            onClick = {
+                                saveLoadScope.launch {
+                                    loadPreset(preset)
+                                }
+                            }
+                        ) {
+                            Text("Load Preset")
+                        }
+
+                        Button(
+                            onClick = {
+                                presets.remove(preset)
+                                config!!.avatars[curAvatarId]!!.presets.remove(preset)
+                                saveConfig()
+                            }
+                        ) {
+                            Text("Delete Preset")
                         }
                     }
-                ) {
-                    Text("Save Preset")
-                }
-
-                Button(
-                    onClick = {
-                        saveLoadScope.launch {
-                            loadPreset(preset)
-                        }
-                    }
-                ) {
-                    Text("Load Preset")
-                }
-
-                Button(
-                    onClick = {
-                        presets.remove(preset)
-                        config!!.avatars[curAvatarId]!!.presets.remove(preset)
-                        saveConfig()
-                    }
-                ) {
-                    Text("Delete Preset")
                 }
             }
         }

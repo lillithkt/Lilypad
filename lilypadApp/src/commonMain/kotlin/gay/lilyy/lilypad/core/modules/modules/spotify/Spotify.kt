@@ -1,19 +1,22 @@
 package gay.lilyy.lilypad.core.modules.modules.spotify
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import com.adamratzman.spotify.*
 import com.adamratzman.spotify.models.CurrentlyPlayingObject
 import gay.lilyy.lilypad.core.Constants
 import gay.lilyy.lilypad.core.HTTPServer
-import gay.lilyy.lilypad.core.modules.Modules
 import gay.lilyy.lilypad.core.CoreModules.Coremodules.chatbox.ChatboxModule
 import gay.lilyy.lilypad.core.modules.CoreModules
 import gay.lilyy.lilypad.core.modules.modules.spotify.types.Lyrics
 import gay.lilyy.lilypad.core.modules.modules.spotify.types.SyncType
 import gay.lilyy.lilypad.openUrlInBrowser
+import gay.lilyy.lilypad.ui.components.LabeledCheckbox
 import io.github.aakira.napier.Napier
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -42,7 +45,7 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
 
 
     override val configClass = SpotifyConfig::class
-    
+
     private var progressMs: Int = 0
 
     override fun buildChatbox(): List<String?> {
@@ -52,13 +55,18 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
         if (track?.asTrack == null) {
             return output
         }
-        output.add("\uD83D\uDCFB ${track.asTrack!!.name} - ${track.asTrack!!.artists.mapNotNull { it.name }.joinToString(", ")}")
+        output.add(
+            "\uD83D\uDCFB ${track.asTrack!!.name} - ${
+                track.asTrack!!.artists.mapNotNull { it.name }.joinToString(", ")
+            }"
+        )
         if (config!!.lyrics.enabled && lyrics !== null && lyrics!!.unsynced === null) {
             output.add(when {
                 lyrics!!.lineSynced !== null -> {
                     lyrics!!.lineSynced!!.lines.find { it.start <= progressMs && it.end >= progressMs }?.text
                         ?: lyrics!!.lineSynced!!.lines.findLast { it.start <= progressMs }?.text
                 }
+
                 lyrics!!.syllableSynced !== null -> {
                     lyrics!!.syllableSynced!!.lines.find {
                         val syllable = it.lead?.first()
@@ -67,8 +75,9 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                         } else {
                             it.start <= progressMs && it.end >= progressMs
                         }
-                    } ?.lead?.joinToString(" ") { it.words }
+                    }?.lead?.joinToString(" ") { it.words }
                 }
+
                 else -> null
             })
         }
@@ -176,7 +185,7 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
         }
 
         Thread {
-            while(true) {
+            while (true) {
                 if (nowPlaying?.isPlaying == true) {
                     progressMs += 250
                 }
@@ -222,7 +231,7 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                 if (response.status == HttpStatusCode.OK) {
                     try {
                         nowPlaying = response.body()
-                    } catch(e: Exception) {
+                    } catch (e: Exception) {
                         if (e.instanceOf(MissingFieldException::class) || e.instanceOf(JsonConvertException::class)) {
                             if (CoreModules.Core.config!!.logs.debug) Napier.d("No song playing")
                             nowPlaying = null
@@ -240,7 +249,7 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
             }
             if (spotifyClient != null) {
                 try {
-                nowPlaying = spotifyClient!!.player.getCurrentlyPlaying()
+                    nowPlaying = spotifyClient!!.player.getCurrentlyPlaying()
                 } catch (e: Exception) {
                     if (e.instanceOf(MissingFieldException::class) || e.instanceOf(JsonConvertException::class)) {
                         if (CoreModules.Core.config!!.logs.debug) Napier.d("No song playing")
@@ -271,8 +280,8 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
         var enabled by remember { mutableStateOf(config!!.enabled) }
         var updateInterval by remember { mutableStateOf(config!!.updateInterval) }
 
-        Text("Enabled")
-        Checkbox(
+        LabeledCheckbox(
+            label = "Enabled",
             checked = enabled,
             onCheckedChange = {
                 enabled = it
@@ -281,21 +290,25 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
             },
         )
 
-        Text("Update Interval")
         TextField(
+            label = { Text("Update Interval") },
             value = updateInterval.toString(),
-            onValueChange = { updateInterval = it.toIntOrNull() ?: 0
-                             config!!.updateInterval = updateInterval
-                             saveConfig() },
+            onValueChange = {
+                updateInterval = it.toIntOrNull() ?: 0
+                config!!.updateInterval = updateInterval
+                saveConfig()
+            },
         )
 
         var useAuthConfig by remember { mutableStateOf(config!!.useAuthConfig) }
-        Text("Use Auth Config")
-        // Center it
-        Text(config!!._useAuthConfigExplanation, style = MaterialTheme.typography.caption.merge(
-            TextStyle(textAlign = TextAlign.Center)
-        ))
-        Checkbox(
+
+        Text(
+            config!!._useAuthConfigExplanation, style = MaterialTheme.typography.caption.merge(
+                TextStyle(textAlign = TextAlign.Center)
+            )
+        )
+        LabeledCheckbox(
+            label = "Use Auth Config",
             checked = useAuthConfig,
             onCheckedChange = {
                 useAuthConfig = it
@@ -303,50 +316,61 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                 saveConfig()
             },
         )
-        if (useAuthConfig) {
-            var clientId by remember { mutableStateOf(config!!.auth.clientId) }
-            var clientSecret by remember { mutableStateOf(config!!.auth.clientSecret) }
 
-            val scope = rememberCoroutineScope()
 
-            Text("Client ID")
-            TextField(
-                value = clientId,
-                onValueChange = { clientId = it
-                                config!!.auth.clientId = it
-                                saveConfig()},
-            )
+        AnimatedVisibility(visible = useAuthConfig) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                var clientId by remember { mutableStateOf(config!!.auth.clientId) }
+                var clientSecret by remember { mutableStateOf(config!!.auth.clientSecret) }
 
-            Text("Client Secret")
-            TextField(
-                value = clientSecret,
-                onValueChange = { clientSecret = it
-                                config!!.auth.clientSecret = it
-                                saveConfig()},
-            )
+                val scope = rememberCoroutineScope()
 
-            Button(onClick = {
-                scope.launch {
-                    updateSpotifyClient()
+                TextField(
+                    label = { Text("Client ID") },
+                    value = clientId,
+                    onValueChange = {
+                        clientId = it
+                        config!!.auth.clientId = it
+                        saveConfig()
+                    },
+                )
+
+                TextField(
+                    label = { Text("Client Secret") },
+                    value = clientSecret,
+                    onValueChange = {
+                        clientSecret = it
+                        config!!.auth.clientSecret = it
+                        saveConfig()
+                    },
+                )
+
+                Button(onClick = {
+                    scope.launch {
+                        updateSpotifyClient()
+                    }
+                }) {
+                    Text("Update Credentials")
                 }
-            }) {
-                Text("Update Credentials")
             }
-        } else {
-            var endpoint by remember { mutableStateOf(config!!.nonAuth.endpoint) }
+        }
+        AnimatedVisibility(visible = !useAuthConfig) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                var endpoint by remember { mutableStateOf(config!!.nonAuth.endpoint) }
 
-            Text("Endpoint")
-            TextField(
-                value = endpoint,
-                onValueChange = { endpoint = it },
-            )
+                TextField(
+                    label = { Text("Endpoint") },
+                    value = endpoint,
+                    onValueChange = { endpoint = it },
+                )
 
-            config!!.nonAuth = SpotifyNonAuthConfig(endpoint)
+                config!!.nonAuth = SpotifyNonAuthConfig(endpoint)
+            }
         }
 
         var lyricsEnabled by remember { mutableStateOf(config!!.lyrics.enabled) }
-        Text("Lyrics Enabled")
-        Checkbox(
+        LabeledCheckbox(
+            label = "Lyrics Enabled",
             checked = lyricsEnabled,
             onCheckedChange = {
                 lyricsEnabled = it
@@ -355,18 +379,24 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
             },
         )
 
-        if (lyricsEnabled) {
-            var provider by remember { mutableStateOf(config!!.lyrics.provider) }
-            Text("Provider")
-            Text(config!!.lyrics._providerExplanation, style = MaterialTheme.typography.caption.merge(
-                TextStyle(textAlign = TextAlign.Center)
-            ))
-            TextField(
-                value = provider,
-                onValueChange = { provider = it
-                                 config!!.lyrics.provider = it
-                                 saveConfig() },
-            )
+        AnimatedVisibility(visible = lyricsEnabled) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                var provider by remember { mutableStateOf(config!!.lyrics.provider) }
+                Text(
+                    config!!.lyrics._providerExplanation, style = MaterialTheme.typography.caption.merge(
+                        TextStyle(textAlign = TextAlign.Center)
+                    )
+                )
+                TextField(
+                    label = { Text("Provider") },
+                    value = provider,
+                    onValueChange = {
+                        provider = it
+                        config!!.lyrics.provider = it
+                        saveConfig()
+                    },
+                )
+            }
         }
     }
 }

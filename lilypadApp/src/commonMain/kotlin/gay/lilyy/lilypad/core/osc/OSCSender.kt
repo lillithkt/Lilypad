@@ -35,11 +35,12 @@ object OSCSender {
 
     fun send(message: OSCMessage) {
         Thread {
-        if (CoreModules.Core.config!!.logs.outgoingData) Napier.v("Sending OSC message: ${message.toFormattedString()}")
-            try{
-        sender.send(message)}catch(e:Exception){
-            Napier.e("Error sending OSC message: ${e.message}")
-        }
+            if (CoreModules.Core.config!!.logs.outgoingData) Napier.v("Sending OSC message: ${message.toFormattedString()}")
+            try {
+                sender.send(message)
+            } catch (e: Exception) {
+                Napier.e("Error sending OSC message: ${e.message}")
+            }
         }.start()
     }
 }

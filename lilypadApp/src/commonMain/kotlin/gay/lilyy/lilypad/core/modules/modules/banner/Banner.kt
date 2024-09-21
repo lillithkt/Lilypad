@@ -1,8 +1,18 @@
 package gay.lilyy.lilypad.core.modules.modules.banner
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
 import gay.lilyy.lilypad.core.CoreModules.Coremodules.chatbox.ChatboxModule
+import gay.lilyy.lilypad.ui.components.LabeledCheckbox
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -14,7 +24,7 @@ data class BannerSet(
 
 @Serializable
 data class BannerConfig(
-    var enabled: Boolean = false,
+    var enabled: Boolean = true,
     var updateInterval: Int = 5000,
     var random: Boolean = false,
     var sets: MutableList<BannerSet> = mutableListOf()
@@ -27,14 +37,16 @@ class Banner : ChatboxModule<BannerConfig>() {
     override val configClass = BannerConfig::class
 
     override val hasSettingsUI = true
+
     @Composable
     override fun onSettingsUI() {
         var enabled by remember { mutableStateOf(config!!.enabled) }
 
-        Text("Enabled")
-        Checkbox(
+        LabeledCheckbox(
+            label = "Enabled",
             checked = enabled,
-            onCheckedChange = { enabled = it
+            onCheckedChange = {
+                enabled = it
                 config!!.enabled = it
                 saveConfig()
             }
@@ -42,8 +54,8 @@ class Banner : ChatboxModule<BannerConfig>() {
 
         var updateInterval by remember { mutableStateOf(config!!.updateInterval) }
 
-        Text("Update Interval")
         TextField(
+            label = { Text("Update Interval") },
             value = updateInterval.toString(),
             onValueChange = {
                 updateInterval = it.toIntOrNull() ?: 5000
@@ -54,10 +66,11 @@ class Banner : ChatboxModule<BannerConfig>() {
 
         var random by remember { mutableStateOf(config!!.random) }
 
-        Text("Random")
-        Checkbox(
+        LabeledCheckbox(
+            label = "Random",
             checked = random,
-            onCheckedChange = { random = it
+            onCheckedChange = {
+                random = it
                 config!!.random = it
                 saveConfig()
             }
@@ -71,49 +84,65 @@ class Banner : ChatboxModule<BannerConfig>() {
             Button(onClick = { setOpen = !setOpen }) {
                 Text(set.name)
             }
-            if (setOpen) {
-                var setEnabled by remember { mutableStateOf(set.enabled) }
-                var setName by remember { mutableStateOf(set.name) }
+            AnimatedVisibility(visible = setOpen) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .clip(RoundedCornerShape(5.dp))
+                        .background(MaterialTheme.colors.background) // TODO: custom color for secondary background
+                        .border(1.dp, MaterialTheme.colors.onPrimary, shape = RoundedCornerShape(5.dp))
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-                Text("Name")
-                TextField(
-                    value = setName,
-                    onValueChange = {
-                        setName = it
-                        set.name = it
-                        config!!.sets = sets
-                        saveConfig()
+
+                        var setEnabled by remember { mutableStateOf(set.enabled) }
+                        var setName by remember { mutableStateOf(set.name) }
+
+                        TextField(
+                            label = { Text("Name") },
+                            value = setName,
+                            onValueChange = {
+                                setName = it
+                                set.name = it
+                                config!!.sets = sets
+                                saveConfig()
+                            }
+                        )
+
+                        LabeledCheckbox(
+                            label = "Enabled",
+                            checked = setEnabled,
+                            onCheckedChange = {
+                                setEnabled = it
+                                set.enabled = it
+                                config!!.sets = sets
+                                saveConfig()
+                            }
+                        )
+
+                        var messages by remember { mutableStateOf(set.messages.joinToString("\n")) }
+
+                        TextField(
+                            label = { Text("Messages") },
+                            value = messages,
+                            onValueChange = {
+                                messages = it
+                                set.messages = it.split("\n").toMutableList()
+                                config!!.sets = sets
+                                saveConfig()
+                            }
+                        )
+                        Button(onClick = {
+                            sets.remove(set)
+                            config!!.sets = sets
+                            saveConfig()
+                        }, colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.error)) {
+                            Text("Delete Set")
+                        }
                     }
-                )
-
-                Text("Enabled")
-                Checkbox(
-                    checked = setEnabled,
-                    onCheckedChange = { setEnabled = it
-                        set.enabled = it
-                        config!!.sets = sets
-                        saveConfig()
-                    }
-                )
-
-                var messages by remember { mutableStateOf(set.messages.joinToString("\n")) }
-
-                Text("Messages")
-                TextField(
-                    value = messages,
-                    onValueChange = {
-                        messages = it
-                        set.messages = it.split("\n").toMutableList()
-                        config!!.sets = sets
-                        saveConfig()
-                    }
-                )
-                Button(onClick = {
-                    sets.remove(set)
-                    config!!.sets = sets
-                    saveConfig()
-                }, colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.error)) {
-                    Text("Delete Set")
                 }
             }
 

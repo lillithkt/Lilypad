@@ -1,5 +1,6 @@
 package gay.lilyy.lilypad.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -12,10 +13,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import gay.lilyy.lilypad.core.modules.Modules
-import gay.lilyy.lilypad.core.CoreModules.Coremodules.gamestorage.GameStorage
 import gay.lilyy.lilypad.core.modules.CoreModules
+import gay.lilyy.lilypad.core.modules.Modules
 import gay.lilyy.lilypad.core.startCore
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -57,15 +58,7 @@ fun App() {
                 modifier = Modifier.fillMaxWidth()
                     .height(256.dp)
             ) {
-
-                Box(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .background(MaterialTheme.colors.primary)
-                        .border(1.dp, MaterialTheme.colors.onPrimary, shape = RoundedCornerShape(5.dp))
-                ) {
-                    CurrentChatbox()
-                }
+                currentChatbox()
             }
         }
 
@@ -82,15 +75,29 @@ fun App() {
         ) {
             Text("Settings", style = MaterialTheme.typography.h4)
 
+            var openedModule by remember { mutableStateOf<String?>(null) }
+
             for (module in Modules.modules.values) {
                 if (module.hasSettingsUI && !module.disabled) {
-                    // Collapsible
-                    var showContent by remember { mutableStateOf(false) }
-                    Button(onClick = { showContent = !showContent }) {
+                    Button(onClick = { openedModule = if (openedModule == module.name) null else module.name }) {
                         Text(module.name)
                     }
-                    if (showContent) {
-                        module.onSettingsUI()
+
+                    AnimatedVisibility(visible = openedModule == module.name) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                                .clip(RoundedCornerShape(5.dp))
+                                .background(MaterialTheme.colors.background)
+                                .border(1.dp, MaterialTheme.colors.onPrimary, shape = RoundedCornerShape(5.dp))
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                module.onSettingsUI()
+                            }
+                        }
                     }
                 }
             }

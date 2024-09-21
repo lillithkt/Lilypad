@@ -1,9 +1,8 @@
 package gay.lilyy.lilypad.core.modules.modules.clock
 
-import androidx.compose.material.Checkbox
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import gay.lilyy.lilypad.core.CoreModules.Coremodules.chatbox.ChatboxModule
+import gay.lilyy.lilypad.ui.components.LabeledCheckbox
 import kotlinx.serialization.Serializable
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -33,13 +32,15 @@ class Clock : ChatboxModule<ClockConfig>() {
     }
 
     override val hasSettingsUI = true
+
     @Composable
     override fun onSettingsUI() {
         var enabled by remember { mutableStateOf(config!!.enabled) }
-        Text("Enabled")
-        Checkbox(
+        LabeledCheckbox(
+            label = "Enabled",
             checked = enabled,
-            onCheckedChange = { enabled = it
+            onCheckedChange = {
+                enabled = it
                 config!!.enabled = it
                 saveConfig()
             }

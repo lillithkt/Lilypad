@@ -8,10 +8,10 @@ import dev.slimevr.oscquery.OscTransport
 import dev.slimevr.oscquery.randomFreePort
 import gay.lilyy.lilypad.core.Utils
 import gay.lilyy.lilypad.core.modules.CoreModules
-import gay.lilyy.lilypad.core.modules.Modules
 import io.github.aakira.napier.Napier
 
 const val vrcOSCStartsWith = "VRChat-Client"
+
 object OSCQuery {
     var server: OSCQueryServer
 
@@ -33,7 +33,13 @@ object OSCQuery {
     init {
         System.setProperty("java.net.preferIPv4Stack", "true") // https://github.com/jmdns/jmdns/issues/244
         val httpPort = randomFreePort()
-        server = OSCQueryServer("Lilypad", OscTransport.UDP, Utils.getLocalIp(), CoreModules.Core.config!!.listen.toUShort(), httpPort)
+        server = OSCQueryServer(
+            "Lilypad",
+            OscTransport.UDP,
+            Utils.getLocalIp(),
+            CoreModules.Core.config!!.listen.toUShort(),
+            httpPort
+        )
         server.rootNode.addNode(OSCQueryNode("/avatar"))
 
 
