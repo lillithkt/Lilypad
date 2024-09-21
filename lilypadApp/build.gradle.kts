@@ -84,7 +84,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        manifestPlaceholders["redirectHostName"] = "com.lilyy.lilypad"
+        manifestPlaceholders["redirectHostName"] = "gay.lilyy.lilypad"
         manifestPlaceholders["redirectSchemeName"] = "lilypad"
     }
     packaging {
@@ -115,7 +115,7 @@ compose.desktop {
         mainClass = "gay.lilyy.lilypad.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Rpm)
             packageName = "gay.lilyy.lilypad"
             packageVersion = "1.0.0"
 
