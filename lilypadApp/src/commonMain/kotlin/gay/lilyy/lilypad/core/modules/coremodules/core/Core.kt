@@ -79,22 +79,22 @@ class Core : Module<CoreConfig>() {
                         saveConfig()
                     }
                 )
-                var incomingOSC by remember { mutableStateOf(config!!.logs.incomingData) }
-                Text("Incoming OSC")
+                var incomingData by remember { mutableStateOf(config!!.logs.incomingData) }
+                Text("Incoming Data")
                 Checkbox(
-                    checked = incomingOSC,
+                    checked = incomingData,
                     onCheckedChange = {
-                        incomingOSC = it
+                        incomingData = it
                         config!!.logs.incomingData = it
                         saveConfig()
                     }
                 )
-                var outgoingOSC by remember { mutableStateOf(config!!.logs.outgoingData) }
-                Text("Outgoing OSC")
+                var outgoingData by remember { mutableStateOf(config!!.logs.outgoingData) }
+                Text("Outgoing Data")
                 Checkbox(
-                    checked = outgoingOSC,
+                    checked = outgoingData,
                     onCheckedChange = {
-                        outgoingOSC = it
+                        outgoingData = it
                         config!!.logs.outgoingData = it
                         saveConfig()
                     }

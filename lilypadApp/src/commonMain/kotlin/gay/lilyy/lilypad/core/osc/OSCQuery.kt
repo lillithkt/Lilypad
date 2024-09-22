@@ -50,7 +50,7 @@ object OSCQuery {
                 if (!it.name.startsWith(vrcOSCStartsWith)) return@addServiceListener
                 oscAddress.value = it.inetAddresses.first().hostAddress
                 oscPort.value = it.port
-                if (CoreModules.Core.config!!.logs.debug) Napier.d("Found VRChat client OSC at $oscAddress:$oscPort")
+                if (CoreModules.Core.config!!.logs.debug) Napier.d("Found VRChat client OSC at ${oscAddress.value}:${oscPort.value}")
                 OSCSender.updateAddress()
             },
             onServiceRemoved = { _, name ->
@@ -69,7 +69,7 @@ object OSCQuery {
                 if (!it.name.startsWith(vrcOSCStartsWith)) return@addServiceListener
                 oscQAddress.value = it.inetAddresses.first().hostAddress
                 oscQPort.value = it.port
-                if (CoreModules.Core.config!!.logs.debug) Napier.d("Found VRChat client OSCQJson at $oscQAddress:$oscQPort")
+                if (CoreModules.Core.config!!.logs.debug) Napier.d("Found VRChat client OSCQJson at ${oscQAddress.value}:${oscQPort.value}")
             },
             onServiceRemoved = { _, name ->
                 if (!name.startsWith(vrcOSCStartsWith)) return@addServiceListener

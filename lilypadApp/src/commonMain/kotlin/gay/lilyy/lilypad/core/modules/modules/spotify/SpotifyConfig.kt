@@ -21,8 +21,6 @@ data class SpotifyNonAuthConfig(
 @Serializable
 data class SpotifyLyricsConfig(
     var enabled: Boolean = true,
-    @SerialName("Provider Explanation")
-    val _providerExplanation: String = "The provider to use for lyrics. This is an instance of https://github.com/imlvna/spotify-lyrics-api",
     var provider: String = "https://spotify-lyrics-api.lvna.workers.dev"
 )
 
@@ -33,7 +31,6 @@ data class SpotifyConfig(
     val lyrics: SpotifyLyricsConfig = SpotifyLyricsConfig(),
     var auth: SpotifyAuthConfig = SpotifyAuthConfig(),
     var nonAuth: SpotifyNonAuthConfig = SpotifyNonAuthConfig(),
-    @SerialName("Use Auth Config Explanation")
-    val _useAuthConfigExplanation: String = "If enabled, the app will use the auth config. If disabled, the app will use the non-auth config. Auth config is standard oauth, non-auth config is an endpoint configured to return the spotify listening data with no authentication, such as https://github.com/ImLvna/spotify-listening",
-    var useAuthConfig: Boolean = false
+    var useAuthConfig: Boolean = false,
+    var spotubeIntegration: Boolean = false
 )
