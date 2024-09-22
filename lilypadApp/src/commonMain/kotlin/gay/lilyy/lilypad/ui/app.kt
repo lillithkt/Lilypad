@@ -17,21 +17,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import gay.lilyy.lilypad.core.modules.CoreModules
 import gay.lilyy.lilypad.core.modules.Modules
-import gay.lilyy.lilypad.core.startCore
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-@OptIn(DelicateCoroutinesApi::class)
 @Composable
 @Preview
-fun App() {
-    val scope = rememberCoroutineScope()
-    scope.launch(Dispatchers.Default) {
-        startCore()
-    }
+fun app() {
     MaterialTheme {
 
         // Scrollable

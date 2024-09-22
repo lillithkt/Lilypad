@@ -7,9 +7,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import gay.lilyy.lilypad.core.globalInit
 import gay.lilyy.lilypad.core.modules.CoreModules
-import gay.lilyy.lilypad.core.modules.Modules
-import gay.lilyy.lilypad.core.startCore
-import gay.lilyy.lilypad.ui.App
+import gay.lilyy.lilypad.ui.app
 import io.github.aakira.napier.Napier
 
 fun main() {
@@ -17,7 +15,9 @@ fun main() {
     registerPreCloseListener()
     if (CoreModules.Core.config!!.headless) {
         Napier.i("Lilypad is running in headless mode.")
-        startCore()
+        // No further initialization is needed.
+        // getting CoreModules initializes Modules,
+        // which in turn initialize all osc stuff when needed
     } else
         application {
             Window(
@@ -25,7 +25,7 @@ fun main() {
                 title = "Lilypad",
                 icon = BitmapPainter(useResource("icons/icon.png", ::loadImageBitmap)),
             ) {
-                App()
+                app()
             }
         }
 }

@@ -1,7 +1,7 @@
 on:
-  #push:
-  #release:
-  #  types: [ created ]
+  push:
+  release:
+    types: [ created ]
 name: Build
 permissions:
   contents: write

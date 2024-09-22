@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import gay.lilyy.lilypad.core.globalInit
-import gay.lilyy.lilypad.ui.App
+import gay.lilyy.lilypad.ui.app
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
         Shared.context = applicationContext
 
         setContent {
-            App()
+            app()
         }
     }
 }
@@ -25,5 +25,5 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 fun AppAndroidPreview() {
-    App()
+    app()
 }
