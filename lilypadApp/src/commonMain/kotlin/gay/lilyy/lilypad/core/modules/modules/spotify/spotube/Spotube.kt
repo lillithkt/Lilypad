@@ -26,7 +26,7 @@ data class SpotubeState(
 )
 
 object Spotube {
-    val jmdns: JmDNS = JmDNS.create(InetAddress.getLocalHost())
+    var jmdns: JmDNS? = null
     val clients: SnapshotStateMap<String, SpotubeState> = mutableStateMapOf()
 
     val json = Json {
@@ -101,9 +101,13 @@ object Spotube {
     }
 
     fun init() {
+        val scope = CoroutineScope(Dispatchers.IO)
+        scope.launch {
+            jmdns = JmDNS.create(InetAddress.getLocalHost())
+        }
         val listener = object : javax.jmdns.ServiceListener {
             override fun serviceAdded(event: javax.jmdns.ServiceEvent) {
-                jmdns.getServiceInfo(event.type, event.name)?.let {
+                jmdns!!.getServiceInfo(event.type, event.name)?.let {
                     addRemote(it)
                 }
             }
@@ -114,8 +118,8 @@ object Spotube {
 
             override fun serviceResolved(event: javax.jmdns.ServiceEvent) {}
         }
-        jmdns.addServiceListener("_spotube._tcp.local.", listener)
-        jmdns.list("_spotube._tcp.local.").forEach {
+        jmdns!!.addServiceListener("_spotube._tcp.local.", listener)
+        jmdns!!.list("_spotube._tcp.local.").forEach {
             addRemote(it)
         }
     }
