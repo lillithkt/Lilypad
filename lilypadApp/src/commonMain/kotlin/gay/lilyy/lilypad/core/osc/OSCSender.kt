@@ -40,7 +40,7 @@ object OSCSender {
 
     fun send(message: OSCMessage) {
         Thread {
-            if (CoreModules.Core.config!!.logs.outgoingData) Napier.v("Sending OSC message: ${message.toFormattedString()}")
+            if (CoreModules.Core.config!!.logs.outgoingData) Napier.v("=> Sending OSC message: ${message.toFormattedString()}")
             try {
                 sender.send(message)
             } catch (e: Exception) {

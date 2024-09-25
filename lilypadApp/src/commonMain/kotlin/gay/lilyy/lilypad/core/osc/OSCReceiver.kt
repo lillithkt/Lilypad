@@ -5,7 +5,6 @@ import com.illposed.osc.OSCMessageEvent
 import com.illposed.osc.OSCMessageListener
 import com.illposed.osc.transport.OSCPortIn
 import gay.lilyy.lilypad.core.modules.CoreModules
-import gay.lilyy.lilypad.core.modules.Modules
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +29,7 @@ object OSCReceiver {
     init {
         updateAddress()
         addListener({ true }) {
-            if (CoreModules.Core.config!!.logs.incomingData) Napier.d("Received message: ${it.message.address} ${it.message.arguments.joinToString()}")
+            if (CoreModules.Core.config!!.logs.incomingData) Napier.d("<= Received OSC message: ${it.message.address} ${it.message.arguments.joinToString()}")
         }
     }
 
@@ -45,5 +44,6 @@ object OSCReceiver {
         }
         listeners += selector to listener
         receiver?.dispatcher?.addListener(selector, listener)
+        if (CoreModules.Core.config!!.logs.debug) Napier.d("Added OSC listener with selector $selector")
     }
 }
