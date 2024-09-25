@@ -193,8 +193,8 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
 
     override fun init() {
         super.init()
-
-        Spotube.init()
+        Napier.d("Init Spotify")
+//        Spotube.init()
 
 
         // Call the suspend updateNowPlaying function every 5 seconds in Dispatchers.IO
