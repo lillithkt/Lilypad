@@ -9,23 +9,26 @@ import gay.lilyy.lilypad.core.modules.Modules
 import io.github.aakira.napier.Napier
 
 object OSCReceiver {
-    var receiver: OSCPortIn? = null
+    private var receiver: OSCPortIn? = null
 
-    val listeners: MutableList<Pair<MessageSelector, OSCMessageListener>> = mutableListOf()
+    private val listeners: MutableList<Pair<MessageSelector, OSCMessageListener>> = mutableListOf()
     fun updateAddress() {
-        if (CoreModules.Core.config!!.logs.debug) Napier.d("Updating OSC receiver address to ${CoreModules.Core.config!!.listen}")
+        if (CoreModules.Core.config!!.logs.debug)
+            Napier.d("Updating OSC receiver address to ${CoreModules.Core.config!!.listen}")
         receiver?.close()
         receiver = OSCPortIn(CoreModules.Core.config!!.listen)
         for ((selector, listener) in listeners) {
             receiver?.dispatcher?.addListener(selector, listener)
         }
+        Napier.d("OSC Listening ....")
         receiver?.startListening()
     }
 
     init {
         updateAddress()
         addListener({ true }) {
-            if (CoreModules.Core.config!!.logs.incomingData) Napier.d("Received message: ${it.message.address} ${it.message.arguments.joinToString()}")
+            if (CoreModules.Core.config!!.logs.incomingData)
+                Napier.d("OSC Received message: ${it.message.address} ${it.message.arguments.joinToString()}")
         }
     }
 

@@ -6,12 +6,15 @@ import com.illposed.osc.argument.handler.Activator
 import com.illposed.osc.transport.OSCPortOut
 import gay.lilyy.lilypad.core.modules.CoreModules
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.net.InetAddress
 import java.net.InetSocketAddress
 
 
 object OSCSender {
-    lateinit var sender: OSCPortOut
+    private lateinit var sender: OSCPortOut
 
     fun updateAddress() {
         val port = OSCQuery.oscPort.value ?: CoreModules.Core.config!!.connect.split(":")[1].toInt()
@@ -26,11 +29,15 @@ object OSCSender {
             serializer.registerArgumentHandler(argumentHandler, typeChar)
             typeChar++
         }
-        sender = OSCPortOut(serializer, InetSocketAddress(InetAddress.getByName(address), port))
+        CoroutineScope(Dispatchers.IO).launch {
+            sender = OSCPortOut(serializer, InetSocketAddress(InetAddress.getByName(address), port))
+        }
     }
 
     init {
-        updateAddress()
+        CoroutineScope(Dispatchers.IO).launch {
+            updateAddress()
+        }
     }
 
     fun send(message: OSCMessage) {
