@@ -4,12 +4,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ServerLogsConfig(
-    var incomingData: Boolean = false,
-    var outgoingData: Boolean = false,
-    var outgoingChatbox: Boolean = false,
+    var incomingData: Boolean = true,
+    var outgoingData: Boolean = true,
+    var outgoingChatbox: Boolean = true,
     var errors: Boolean = true,
     var warnings: Boolean = true,
-    var debug: Boolean = false
+    var debug: Boolean = true
 )
 
 
