@@ -14,7 +14,7 @@ import java.net.InetSocketAddress
 
 
 object OSCSender {
-    lateinit var sender: OSCPortOut
+    private lateinit var sender: OSCPortOut
 
     fun updateAddress() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -30,12 +30,16 @@ object OSCSender {
                 serializer.registerArgumentHandler(argumentHandler, typeChar)
                 typeChar++
             }
-            sender = OSCPortOut(serializer, InetSocketAddress(InetAddress.getByName(address), port))
+            CoroutineScope(Dispatchers.IO).launch {
+                sender = OSCPortOut(serializer, InetSocketAddress(InetAddress.getByName(address), port))
+            }
         }
     }
 
     init {
-        updateAddress()
+        CoroutineScope(Dispatchers.IO).launch {
+            updateAddress()
+        }
     }
 
     fun send(message: OSCMessage) {
