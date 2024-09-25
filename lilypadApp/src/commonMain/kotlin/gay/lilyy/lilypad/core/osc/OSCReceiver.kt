@@ -17,6 +17,7 @@ object OSCReceiver {
         receiver?.close()
         receiver = OSCPortIn(CoreModules.Core.config!!.listen)
         for ((selector, listener) in listeners) {
+            Napier.d("Add OSC listener ${selector} ${listener}")
             receiver?.dispatcher?.addListener(selector, listener)
         }
         receiver?.startListening()
@@ -25,7 +26,8 @@ object OSCReceiver {
     init {
         updateAddress()
         addListener({ true }) {
-            if (CoreModules.Core.config!!.logs.incomingData) Napier.d("Received message: ${it.message.address} ${it.message.arguments.joinToString()}")
+            if (CoreModules.Core.config!!.logs.incomingData)
+                Napier.d("<= OSC Received message: ${it.message.address} ${it.message.arguments.joinToString()}")
         }
     }
 
