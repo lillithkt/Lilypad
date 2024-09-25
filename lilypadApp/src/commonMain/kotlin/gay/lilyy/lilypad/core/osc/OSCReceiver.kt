@@ -11,17 +11,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 object OSCReceiver {
-    var receiver: OSCPortIn? = null
+    private var receiver: OSCPortIn? = null
 
-    val listeners: MutableList<Pair<MessageSelector, OSCMessageListener>> = mutableListOf()
+    private val listeners: MutableList<Pair<MessageSelector, OSCMessageListener>> = mutableListOf()
     fun updateAddress() {
         CoroutineScope(Dispatchers.IO).launch {
             if (CoreModules.Core.config!!.logs.debug) Napier.d("Updating OSC receiver address to ${CoreModules.Core.config!!.listen}")
             receiver?.close()
             receiver = OSCPortIn(CoreModules.Core.config!!.listen)
             for ((selector, listener) in listeners) {
+                if (CoreModules.Core.config!!.logs.debug) Napier.d("Add OSC listener ${selector} ${listener}")
                 receiver?.dispatcher?.addListener(selector, listener)
             }
+            if (CoreModules.Core.config!!.logs.debug) Napier.d("OSC Listening ${CoreModules.Core.config!!.listen} ....")
             receiver?.startListening()
         }
     }
