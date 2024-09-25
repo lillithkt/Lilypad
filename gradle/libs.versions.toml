@@ -1,3 +1,4 @@
+#noinspection SimilarGradleDependency
 [versions]
 agp = "8.5.2"
 android-compileSdk = "34"
@@ -12,7 +13,6 @@ oscquery = "b3f9ba2e22ec753f7e9de6aad45fe86d6a94ca15"
 osc = "0.8"
 kotlinx-serialization = "1.7.1"
 kotlin-plugin-serialization = "2.0.0"
-voyager = "1.1.0-beta02"
 napier = "2.7.1"
 spotify = "4.1.3"
 ktor = "2.3.12"
@@ -30,9 +30,6 @@ oscquery = { group = "com.github.SlimeVR", name = "oscquery-kt", version.ref = "
 osc = { group = "com.illposed.osc", name = "javaosc-core", version.ref = "osc" }
 
 napier = { group = "io.github.aakira", name = "napier", version.ref = "napier" }
-
-voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
-voyager-tabNavigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
 
 spotify = { group = "com.adamratzman", name = "spotify-api-kotlin-core", version.ref = "spotify" }
 

@@ -19,3 +19,5 @@ actual fun openUrlInBrowser(url: String) {
 actual fun getFilesDir(): String {
     return Shared.context?.filesDir?.absolutePath ?: ""
 }
+
+actual fun getPlatformModuleList(): PlatformModuleList = PlatformModuleList()

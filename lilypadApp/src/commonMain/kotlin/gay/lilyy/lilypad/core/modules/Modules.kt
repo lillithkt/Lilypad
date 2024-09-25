@@ -10,6 +10,7 @@ import gay.lilyy.lilypad.core.modules.modules.clock.Clock
 import gay.lilyy.lilypad.core.modules.modules.spotify.Spotify
 import gay.lilyy.lilypad.core.modules.modules.template.FullbodySlide
 import gay.lilyy.lilypad.getFilesDir
+import gay.lilyy.lilypad.getPlatformModuleList
 import io.github.aakira.napier.Napier
 import io.ktor.server.routing.*
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -89,7 +90,8 @@ object CoreModules {
     val all: List<Module<*>> = listOf(
         Core,
         GameStorage,
-        Chatbox
+        Chatbox,
+        *getPlatformModuleList().coreModules.toTypedArray()
     )
 
     init {
@@ -105,7 +107,8 @@ object Modules {
         Banner(),
         Clock(),
         Spotify(),
-        FullbodySlide()
+        FullbodySlide(),
+        *getPlatformModuleList().modules.toTypedArray()
     ).associateBy { it.name }.toMutableMap()
 
 
@@ -143,7 +146,7 @@ object ConfigStorage {
     init {
         try {
             if (CoreModules.Core.config?.logs?.debug == true) Napier.v("Loading config from ${configFile.absolutePath}")
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             /* no-op */
         }
         all = if (configFile.exists()) {

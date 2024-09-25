@@ -19,3 +19,5 @@ actual fun openUrlInBrowser(url: String) {
 actual fun getFilesDir(): String {
     return File("").absolutePath
 }
+
+actual fun getPlatformModuleList(): PlatformModuleList = PlatformModuleList()

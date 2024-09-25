@@ -41,9 +41,6 @@ kotlin {
             implementation(libs.oscquery)
             implementation(libs.osc)
 
-            implementation(libs.voyager.navigator)
-            implementation(libs.voyager.tabNavigator)
-
             implementation(libs.napier)
 
             implementation(libs.spotify)
