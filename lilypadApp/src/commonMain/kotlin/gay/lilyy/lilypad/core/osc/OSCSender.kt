@@ -32,6 +32,8 @@ object OSCSender {
             }
             CoroutineScope(Dispatchers.IO).launch {
                 sender = OSCPortOut(serializer, InetSocketAddress(InetAddress.getByName(address), port))
+                val message = OSCMessage("/filter")
+                send(message)
             }
         }
     }
