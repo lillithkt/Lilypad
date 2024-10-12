@@ -26,6 +26,7 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
 
     var lastOutput: SnapshotStateList<String?> = mutableStateListOf()
     private var timeoutUp: Boolean = true
+    private var lastOutputTime: Long = 0
 
     private fun build(): List<String> {
         if (!config!!.enabled) return emptyList()
@@ -71,7 +72,8 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
         while (true) {
             val output = build()
             withContext(Dispatchers.Main) {
-                if (output != lastOutput) {
+                // Resend again if the output hasn't changed after 15s
+                if (output != lastOutput || System.currentTimeMillis() - lastOutputTime > 15000) {
                     if (timeoutUp) {
                         val chatbox = output.joinToString("\n")
                         if (CoreModules.Core.config!!.logs.outgoingChatbox) Napier.v(chatbox)
@@ -80,6 +82,7 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
                         scope.launch {
                             lastOutput.clear()
                             lastOutput.addAll(output)
+                            lastOutputTime = System.currentTimeMillis()
                         }
                         resetTimeout()
                     }

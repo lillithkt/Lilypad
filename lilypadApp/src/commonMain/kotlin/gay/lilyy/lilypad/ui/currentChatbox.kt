@@ -27,7 +27,7 @@ fun currentChatbox() {
     }
 
 
-    if (!chatboxText.isEmpty()) {
+    if (chatboxText.isNotEmpty()) {
         Box(
             modifier = Modifier
                 .padding(8.dp)

@@ -104,7 +104,7 @@ object Spotube {
         val scope = CoroutineScope(Dispatchers.IO)
         scope.launch {
             jmdns = JmDNS.create(InetAddress.getLocalHost())
-        }
+        
         val listener = object : javax.jmdns.ServiceListener {
             override fun serviceAdded(event: javax.jmdns.ServiceEvent) {
                 jmdns!!.getServiceInfo(event.type, event.name)?.let {
@@ -122,5 +122,6 @@ object Spotube {
         jmdns!!.list("_spotube._tcp.local.").forEach {
             addRemote(it)
         }
+    }
     }
 }
