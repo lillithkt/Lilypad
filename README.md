@@ -19,6 +19,8 @@ My custom osc client and chatbox!
 - - Provides ChatboxModule, an extension of the module class that provides chatbox functionality, and the actual module manages the chatbox
 
 #### Normal Modules
+- Messages
+- - Allows you to send normal messages to the chatbox
 - AvatarPresets
 - - Allows you to save and load avatar parameters!
 - Banner
