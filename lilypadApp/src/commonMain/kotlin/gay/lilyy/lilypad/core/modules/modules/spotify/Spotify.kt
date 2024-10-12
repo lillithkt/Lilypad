@@ -93,7 +93,10 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                         ?: lyrics!!.lineSynced!!.lines.findLast { it.start <= progressMs }?.text
                 }
 
+
+
                 lyrics!!.syllableSynced !== null -> {
+                    var lyricStr = ""
                     lyrics!!.syllableSynced!!.lines.find {
                         val syllable = it.lead?.first()
                         if (syllable != null) {
@@ -101,8 +104,15 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                         } else {
                             it.start <= progressMs && it.end >= progressMs
                         }
-                    }?.lead?.joinToString(" ") { it.words }
+                    }?.lead?.forEach {
+                        lyricStr += it.words
+                        if (!it.part) {
+                            lyricStr += " "
+                        }
+                    }
+                    lyricStr
                 }
+
 
                 else -> null
             })
