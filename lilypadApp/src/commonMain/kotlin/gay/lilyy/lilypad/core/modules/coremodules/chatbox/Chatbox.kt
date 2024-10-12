@@ -9,6 +9,7 @@ import com.illposed.osc.OSCMessage
 import gay.lilyy.lilypad.core.modules.CoreModules
 import gay.lilyy.lilypad.core.modules.Modules
 import gay.lilyy.lilypad.core.osc.OSCSender
+import gay.lilyy.lilypad.ui.components.LabeledCheckbox
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +28,8 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
     var lastOutput: SnapshotStateList<String?> = mutableStateListOf()
     private var timeoutUp: Boolean = true
     private var lastOutputTime: Long = 0
+
+    val transparentChars = "\u0003\u001f"
 
     private fun build(): List<String> {
         if (!config!!.enabled) return emptyList()
@@ -64,6 +67,10 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
             }
 
             lines += output
+        }
+
+        if (config!!.transparent) {
+            lines[lines.count() - 1] += transparentChars
         }
 
         return lines
@@ -155,6 +162,17 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
         TextField(
             value = updateInterval.toString(),
             onValueChange = { updateInterval = it.toIntOrNull() ?: 0 },
+        )
+
+        var transparent by remember { mutableStateOf(config!!.transparent) }
+        LabeledCheckbox(
+            label = "Transparent",
+            checked = transparent,
+            onCheckedChange = {
+                transparent = it
+                config!!.transparent = it
+                saveConfig()
+            },
         )
     }
 

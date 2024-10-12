@@ -5,6 +5,7 @@ My custom osc client and chatbox!
 ## Features
 - Modular, drag and drop your own modules!
 - Highly Customizable
+- Supports making the chatbox transparent
 - Supports OSCQuery, so you can run this on separate hardware!
 - A lock-based HTTP Server, for oAuth!
 - Runs on Quest Standalone! (Or anything android)

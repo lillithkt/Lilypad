@@ -38,7 +38,7 @@ fun currentChatbox() {
         ) {
 
             Text(
-                chatboxText, style = MaterialTheme.typography.body1.merge(
+                chatboxText.replace(CoreModules.Chatbox.transparentChars, ""), style = MaterialTheme.typography.body1.merge(
                     // Center text
                     TextStyle(textAlign = TextAlign.Center)
                 )
