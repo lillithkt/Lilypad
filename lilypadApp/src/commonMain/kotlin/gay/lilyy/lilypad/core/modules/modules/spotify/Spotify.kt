@@ -206,6 +206,9 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                     updateNowPlaying()
                 } catch (e: Exception) {
                     if (CoreModules.Core.config!!.logs.errors) Napier.e("Failed to update now playing", e)
+                    nowPlaying = null
+                    sptProgressMs = 0
+                    lyrics = null
                     updateSpotifyClient(true)
                 }
                 Thread.sleep(config!!.updateInterval.toLong())
@@ -223,6 +226,7 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                 }
                 if (lastTrackId != track?.id) {
                     lastTrackId = track?.id
+                    lyrics = null
                     scope.launch {
                         getLyrics()
                     }
@@ -257,6 +261,8 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                 SyncType.SYLLABLE_SYNCED.name -> Lyrics(syllableSynced = json.decodeFromJsonElement(body))
                 else -> null
             }
+        } else {
+            lyrics = null
         }
     }
 
