@@ -2,6 +2,7 @@ package gay.lilyy.lilypad.core.CoreModules.Coremodules.chatbox
 
 import gay.lilyy.lilypad.core.modules.Module
 
+
 abstract class ChatboxModule<T : Any> : Module<T>() {
     /**
      * The order in which the chatbox is built, relative to other modules.
@@ -14,6 +15,15 @@ abstract class ChatboxModule<T : Any> : Module<T>() {
      * @return A string to be appended to the chatbox.
      */
     open fun buildChatbox(): List<String?>? {
+        return null
+    }
+
+    /**
+     * Called to build the full chatbox.
+     * If anything is returned here, the chatbox will not be built using buildChatbox.
+     * @return A list of strings to be appended to the chatbox.
+     */
+    open fun buildFullChatbox(): List<String?>? {
         return null
     }
 }

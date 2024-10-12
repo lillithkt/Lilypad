@@ -38,6 +38,15 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
             outputs += module.buildChatbox()?.filterNotNull() ?: continue
         }
 
+        for (module in modules) {
+            val fullChatbox = module.buildFullChatbox()
+            if (!fullChatbox.isNullOrEmpty() && fullChatbox.any { it != null }) {
+                outputs.clear()
+                outputs += fullChatbox.filterNotNull()
+                break
+            }
+        }
+
         val lines: MutableList<String> = mutableListOf()
 
         for (output in outputs) {
