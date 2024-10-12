@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import gay.lilyy.lilypad.core.CoreModules.Coremodules.chatbox.Chatbox
 import gay.lilyy.lilypad.core.CoreModules.CoreCoreModules.Core.Core
 import gay.lilyy.lilypad.core.CoreModules.Coremodules.gamestorage.GameStorage
+import gay.lilyy.lilypad.core.modules.modules.message.Message
 import gay.lilyy.lilypad.core.modules.modules.avatarpresets.AvatarPresets
 import gay.lilyy.lilypad.core.modules.modules.banner.Banner
 import gay.lilyy.lilypad.core.modules.modules.clock.Clock
@@ -103,6 +104,7 @@ object Modules {
     @OptIn(DelicateCoroutinesApi::class)
     val modules: MutableMap<String, Module<*>> = listOf(
         *CoreModules.all.toTypedArray(),
+        Message(),
         AvatarPresets(),
         Banner(),
         Clock(),
