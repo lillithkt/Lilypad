@@ -28,12 +28,13 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
     var lastOutput: SnapshotStateList<String?> = mutableStateListOf()
     private var timeoutUp: Boolean = true
     private var lastOutputTime: Long = 0
+    val scope = CoroutineScope(Dispatchers.IO)
 
     val transparentChars = "\u0003\u001f"
 
     private fun build(): List<String> {
         if (!config!!.enabled) return emptyList()
-        val modules = Modules.modules.values.filterIsInstance<ChatboxModule<*>>().sortedBy { it.chatboxBuildOrder }
+        val modules = Modules.modules.values.filterIsInstance<ChatboxModule<*>>().filter { !it.disabled }.sortedBy { it.chatboxBuildOrder }
 
         val outputs = mutableListOf<String>()
 
@@ -178,7 +179,6 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
 
     override fun init() {
         super.init()
-        val scope = CoroutineScope(Dispatchers.IO)
 
         scope.launch {
             loopBuildChatbox()

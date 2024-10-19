@@ -7,12 +7,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import com.adamratzman.spotify.*
 import com.adamratzman.spotify.models.CurrentlyPlayingObject
+import com.adamratzman.spotify.models.Track
 import gay.lilyy.lilypad.core.Constants
 import gay.lilyy.lilypad.core.HTTPServer
 import gay.lilyy.lilypad.core.CoreModules.Coremodules.chatbox.ChatboxModule
 import gay.lilyy.lilypad.core.modules.CoreModules
-import gay.lilyy.lilypad.core.modules.modules.spotify.spotube.Spotube
-import gay.lilyy.lilypad.core.modules.modules.spotify.spotube.SpotubeTrack
 import gay.lilyy.lilypad.core.modules.modules.spotify.types.Lyrics
 import gay.lilyy.lilypad.core.modules.modules.spotify.types.SyncType
 import gay.lilyy.lilypad.openUrlInBrowser
@@ -47,35 +46,19 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
 
     override val configClass = SpotifyConfig::class
 
-    private var sptProgressMs: Int = 0
-    private val progressMs: Int
-        get() {
-            if (!config!!.enabled) return 0
-            return if (config!!.spotubeIntegration) {
-                Spotube.currentClient?.currentTrackPosition ?: 0
-            } else {
-                sptProgressMs
-            }
-        }
+    private var progressMs: Int = 0
 
     private val isPlaying: Boolean
         get() {
             if (!config!!.enabled) return false
-            return if (config!!.spotubeIntegration) {
-                !(Spotube.currentClient?.currentTrack == null || Spotube.currentClient?.playing != true)
-            } else {
-                !(nowPlaying == null || !nowPlaying!!.isPlaying)
-            }
+            return !(nowPlaying == null || !nowPlaying!!.isPlaying)
+
         }
-    private val track: SpotubeTrack?
+    private val track: Track?
         get() {
             if (!config!!.enabled) return null
-            return if (config!!.spotubeIntegration) {
-                Spotube.currentClient?.currentTrack
-            } else {
                 if (nowPlaying?.item?.asTrack == null) return null
-                SpotubeTrack.fromTrack(nowPlaying!!.item!!.asTrack!!)
-            }
+                return nowPlaying!!.item!!.asTrack!!
         }
 
     override fun buildChatbox(): List<String?> {
@@ -83,7 +66,7 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
         if (!isPlaying || track == null) return output
         output.add(
             "\uD83D\uDCFB ${track!!.name} - ${
-                track!!.artists.joinToString(", ") { it.name }
+                track!!.artists.joinToString(", ") { it.name.toString() }
             }"
         )
         if (config!!.lyrics.enabled && lyrics !== null && lyrics!!.unsynced === null) {
@@ -97,12 +80,12 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
 
                 lyrics!!.syllableSynced !== null -> {
                     var lyricStr = ""
-                    lyrics!!.syllableSynced!!.lines.find {
+                    lyrics!!.syllableSynced!!.lines.findLast {
                         val syllable = it.lead?.first()
                         if (syllable != null) {
-                            syllable.start <= progressMs && syllable.end >= progressMs
+                            syllable.start <= progressMs// && syllable.end >= progressMs
                         } else {
-                            it.start <= progressMs && it.end >= progressMs
+                            it.start <= progressMs// && it.end >= progressMs
                         }
                     }?.lead?.forEach {
                         lyricStr += it.words
@@ -204,9 +187,6 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
     override fun init() {
         super.init()
 
-        Spotube.init()
-
-
         // Call the suspend updateNowPlaying function every 5 seconds in Dispatchers.IO
         val scope = CoroutineScope(Dispatchers.Default)
 
@@ -217,7 +197,7 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                 } catch (e: Exception) {
                     if (CoreModules.Core.config!!.logs.errors) Napier.e("Failed to update now playing", e)
                     nowPlaying = null
-                    sptProgressMs = 0
+                    progressMs = 0
                     lyrics = null
                     updateSpotifyClient(true)
                 }
@@ -229,10 +209,7 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
             var lastTrackId = track?.id
             while (true) {
                 if (nowPlaying?.isPlaying == true) {
-                    sptProgressMs += 250
-                }
-                for (client in Spotube.clients.values) {
-                    if (client.playing) client.currentTrackPosition = client.currentTrackPosition?.plus(250)
+                    progressMs += 250
                 }
                 if (lastTrackId != track?.id) {
                     lastTrackId = track?.id
@@ -318,7 +295,7 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
         }
 
         if (nowPlaying?.progressMs != null) {
-            sptProgressMs = nowPlaying?.progressMs ?: 0
+            progressMs = nowPlaying?.progressMs ?: 0
         }
 
         if (track?.id != oldId) {
@@ -444,52 +421,6 @@ class Spotify : ChatboxModule<SpotifyConfig>() {
                         saveConfig()
                     },
                 )
-            }
-        }
-
-        var spotubeIntegration by remember { mutableStateOf(config!!.spotubeIntegration) }
-        LText.Caption("If enabled, the app can pull the now playing state from Spotube, an app for spotify that imo works better on quest")
-        LabeledCheckbox(
-            label = "Spotube Integration",
-            checked = spotubeIntegration,
-            onCheckedChange = {
-                spotubeIntegration = it
-                config!!.spotubeIntegration = it
-                saveConfig()
-            },
-        )
-        AnimatedVisibility(visible = spotubeIntegration) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                // Dropdown of all clients
-                var selectedClient by remember { Spotube.selectedClient }
-
-                val clients = remember { Spotube.clients }
-
-                var expanded by remember { mutableStateOf(false) }
-                LText.Caption("Selecting nothing will default to the first client")
-                ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = {
-                    expanded = !expanded
-                }) {
-                    TextField(value = Spotube.currentClient?.name ?: "Select a client",
-                        onValueChange = {},
-                        readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-
-                    )
-
-                    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                        clients.forEach { client ->
-                            DropdownMenuItem(onClick = {
-                                if (selectedClient == client.key) {
-                                    selectedClient = null
-                                } else {
-                                    selectedClient = client.key
-                                }
-                                expanded = false
-                            }) { Text(client.value.name) }
-                        }
-                    }
-                }
             }
 
         }

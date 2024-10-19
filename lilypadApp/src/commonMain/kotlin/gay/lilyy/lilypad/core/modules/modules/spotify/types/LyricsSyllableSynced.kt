@@ -23,7 +23,7 @@ data class LyricsSyllableSyncedLine(
     val start: Float,
     val end: Float,
     val lead: List<SyllableLyricGroup>? = null,
-    val background: Background? = null
+    val background: List<Background>? = null
 )
 
 @Serializable

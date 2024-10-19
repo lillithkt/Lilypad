@@ -8,9 +8,16 @@ import androidx.compose.ui.window.application
 import gay.lilyy.lilypad.core.globalInit
 import gay.lilyy.lilypad.core.modules.CoreModules
 import gay.lilyy.lilypad.ui.app
+import gay.lilyy.lilypad.util.PrintStreamDuplexer
 import io.github.aakira.napier.Napier
+import java.io.File
+import java.io.PrintStream
 
 fun main() {
+    val logFile = File(getFilesDir(), "lilypad.log")
+    val logStream = PrintStreamDuplexer(System.out, PrintStream(logFile))
+    System.setOut(logStream)
+    System.setErr(logStream)
     globalInit()
     registerPreCloseListener()
     if (CoreModules.Core.config!!.headless) {
