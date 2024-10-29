@@ -8,7 +8,7 @@ import gay.lilyy.lilypad.core.modules.modules.message.Message
 import gay.lilyy.lilypad.core.modules.modules.avatarpresets.AvatarPresets
 import gay.lilyy.lilypad.core.modules.modules.banner.Banner
 import gay.lilyy.lilypad.core.modules.modules.clock.Clock
-import gay.lilyy.lilypad.core.modules.modules.spotify.Spotify
+import gay.lilyy.lilypad.core.modules.modules.music.Music
 import gay.lilyy.lilypad.core.modules.modules.template.FullbodySlide
 import gay.lilyy.lilypad.getFilesDir
 import gay.lilyy.lilypad.getPlatformModuleList
@@ -108,7 +108,7 @@ object Modules {
         AvatarPresets(),
         Banner(),
         Clock(),
-        Spotify(),
+        Music(),
         FullbodySlide(),
         *getPlatformModuleList().modules.toTypedArray()
     ).associateBy { it.name }.toMutableMap()

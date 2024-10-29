@@ -1,12 +1,12 @@
-package gay.lilyy.lilypad.core.modules.modules.spotify
+package gay.lilyy.lilypad.core.modules.modules.music
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class SpotifyAuthConfig(
-    var clientId: String = "",
-    var clientSecret: String = "",
+    var clientId: String = "c3f24d18504a41d9ae10d01afa8f91dc",
+    var clientSecret: String = "a9439ea221b64e49995d34ece0f47d40",
     @SerialName("Token Explanation")
     val _tokenExplanation: String = "Do not specify the token yourself. It will automatically be regenerated",
     var token: String? = null,
@@ -26,11 +26,8 @@ data class SpotifyLyricsConfig(
 
 @Serializable
 data class SpotifyConfig(
-    var enabled: Boolean = false,
-    var updateInterval: Int = 5000,
     val lyrics: SpotifyLyricsConfig = SpotifyLyricsConfig(),
     var auth: SpotifyAuthConfig = SpotifyAuthConfig(),
     var nonAuth: SpotifyNonAuthConfig = SpotifyNonAuthConfig(),
-    var useAuthConfig: Boolean = false,
-    var spotubeIntegration: Boolean = false
+    var useAuthConfig: Boolean = false
 )

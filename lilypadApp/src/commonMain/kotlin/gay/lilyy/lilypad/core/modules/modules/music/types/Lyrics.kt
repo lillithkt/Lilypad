@@ -1,4 +1,4 @@
-package gay.lilyy.lilypad.core.modules.modules.spotify.types
+package gay.lilyy.lilypad.core.modules.modules.music.types
 
 enum class SyncType {
     UNSYNCED,
