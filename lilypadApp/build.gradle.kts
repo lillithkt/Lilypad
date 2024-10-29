@@ -82,7 +82,7 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
-        versionName = "1.0.2"
+        versionName = "1.0.3"
 
         manifestPlaceholders["redirectHostName"] = "gay.lilyy.lilypad"
         manifestPlaceholders["redirectSchemeName"] = "lilypad"
@@ -117,7 +117,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Rpm)
             packageName = "gay.lilyy.lilypad"
-            packageVersion = "1.0.2"
+            packageVersion = "1.0.3"
 
             macOS {
                 iconFile.set(resourcesRoot.resolve("icons/icon.icns"))
