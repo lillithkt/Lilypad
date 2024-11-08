@@ -70,7 +70,7 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
             lines += output
         }
 
-        if (config!!.transparent) {
+        if (config!!.transparent && lines.isNotEmpty()) {
             lines[lines.count() - 1] += transparentChars
         }
 
