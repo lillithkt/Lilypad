@@ -29,5 +29,6 @@ data class SpotifyConfig(
     val lyrics: SpotifyLyricsConfig = SpotifyLyricsConfig(),
     var auth: SpotifyAuthConfig = SpotifyAuthConfig(),
     var nonAuth: SpotifyNonAuthConfig = SpotifyNonAuthConfig(),
-    var useAuthConfig: Boolean = false
+    var useAuthConfig: Boolean = false,
+    var showTimestamp: Boolean = true,
 )

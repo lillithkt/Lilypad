@@ -81,8 +81,13 @@ class Music : ChatboxModule<MusicConfig>() {
             MusicType.SPOTIFY -> {
                 output.add(
                     "\uD83D\uDCFB ${spotifyTrack!!.name} - ${
-                        spotifyTrack!!.artists.joinToString(", ") { it.name.toString() }
-                    }"
+                        spotifyTrack!!.artists.first().name
+                    }" +
+                            if (config!!.spotify.showTimestamp) {
+                                " (${sptProgressMs / 1000 / 60}:${if ((sptProgressMs / 1000 % 60) < 10) "0" else ""}${sptProgressMs / 1000 % 60} / ${spotifyTrack!!.durationMs / 1000 / 60}:${if ((spotifyTrack!!.durationMs / 1000 % 60) < 10) "0" else ""}${spotifyTrack!!.durationMs / 1000 % 60})"
+                            } else {
+                                ""
+                            }
                 )
             }
 
@@ -455,6 +460,17 @@ class Music : ChatboxModule<MusicConfig>() {
         AnimatedVisibility(visible = type == MusicType.SPOTIFY) {
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                var showTimestamps by remember { mutableStateOf(config!!.spotify.showTimestamp) }
+                LabeledCheckbox(
+                    label = "Show Timestamps",
+                    checked = showTimestamps,
+                    onCheckedChange = {
+                        showTimestamps = it
+                        config!!.spotify.showTimestamp = it
+                        saveConfig()
+                    },
+                )
 
                 var useAuthConfig by remember { mutableStateOf(config!!.spotify.useAuthConfig) }
 
