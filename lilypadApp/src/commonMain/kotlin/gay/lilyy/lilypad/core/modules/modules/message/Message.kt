@@ -1,10 +1,16 @@
 package gay.lilyy.lilypad.core.modules.modules.message
 
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.*
+import androidx.compose.ui.text.input.ImeAction
 import com.illposed.osc.OSCMessage
+import gay.lilyy.lilypad.core.CoreModules.Coremodules.chatbox.ChatboxFlags
 import gay.lilyy.lilypad.core.CoreModules.Coremodules.chatbox.ChatboxModule
 import gay.lilyy.lilypad.core.osc.OSCSender
 import gay.lilyy.lilypad.getPlatform
@@ -19,21 +25,20 @@ class Message : ChatboxModule<Any>() {
 
     override val disabled = getPlatform().name.contains("Android")
 
-    var previousMessage: MutableState<String?> = mutableStateOf(null)
-    var lastMessageState: MutableState<String> = mutableStateOf("")
-    var lastMessage: String = ""
-    var lastMessageTime: Long = 0
-    var previousMessageTime: Long = 0
-    var lastTypingPing: Long = 0
+    private var previousMessage: MutableState<String?> = mutableStateOf(null)
+    private var lastMessageState: MutableState<String> = mutableStateOf("")
+    private var lastMessageTime: Long = 0
+    private var previousMessageTime: Long = 0
+    private var lastTypingPing: Long = 0
 
     override val hasSettingsUI = true
 
-    fun sendTypingMessage() {
+    private fun sendTypingMessage() {
         // send the current last message
-        OSCSender.send(OSCMessage("/chatbox/input", listOf(lastMessageState.value, true)))
-        previousMessage.value = lastMessage
+        if (lastMessageState.value.isNotEmpty())
+            OSCSender.send(OSCMessage("/chatbox/input", listOf(lastMessageState.value, true)))
+        previousMessage.value = lastMessageState.value
         lastMessageState.value = ""
-        lastMessage = ""
         lastMessageTime = System.currentTimeMillis()
         previousMessageTime = System.currentTimeMillis()
         OSCSender.send(OSCMessage("/chatbox/typing", listOf(false)))
@@ -45,7 +50,7 @@ class Message : ChatboxModule<Any>() {
         var lastMessage by remember { lastMessageState }
 
         // button to send previous message
-        if (previousMessage != null) {
+        if (!previousMessage.isNullOrEmpty()) {
             Text("Previous Message")
             LText.Caption(previousMessage!!)
             Button(onClick = {
@@ -60,23 +65,28 @@ class Message : ChatboxModule<Any>() {
         // button to send custom message
         TextField(
             value = lastMessage,
-            onValueChange = { lastMessage = it
-                            lastMessageTime = System.currentTimeMillis()},
+            onValueChange = { value ->
+                lastMessage = value.filter { it != '\n' }
+                lastMessageTime = System.currentTimeMillis()},
+            modifier = Modifier.onKeyEvent { keyEvent ->
+                if (listOf(KeyEventType.KeyDown, KeyEventType.KeyUp).contains(keyEvent.type) && keyEvent.key == Key.Enter) {
+                    sendTypingMessage()
+                    true
+                } else {
+                    false
+                }
+            },
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    sendTypingMessage()
+                }
+            ),
             label = { Text("Type a message") }
         )
-
-        Button(
-            onClick = {
-                sendTypingMessage()
-            }
-        ) {
-            Text("Send")
-        }
-
-
     }
 
-    val scope = CoroutineScope(Dispatchers.Main)
+    private val scope = CoroutineScope(Dispatchers.Main)
 
     override val chatboxBuildOrder = 1
     override fun buildChatbox(): List<String?>? {
@@ -84,8 +94,6 @@ class Message : ChatboxModule<Any>() {
         scope.launch {
             // Check if it has been 15s since the last message
             if (System.currentTimeMillis() - lastMessageTime > 15000) {
-
-                lastMessage = ""
                 lastMessageState.value = ""
                 lastMessageTime = System.currentTimeMillis()
 
@@ -104,11 +112,11 @@ class Message : ChatboxModule<Any>() {
     }
     override fun buildFullChatbox(): List<String?>? {
         // FIX THIS COPILOT: Reading a state that was created after the snapshot was taken or in a snapshot that has not yet been applied
-        if (lastMessage.isNotEmpty()) {
-            return listOf(lastMessage)
+        if (lastMessageState.value.isNotEmpty()) {
+            return listOf(ChatboxFlags.NONTRANSPARENT.flag, lastMessageState.value)
         }
-        if (previousMessage.value != null && System.currentTimeMillis() - previousMessageTime < 15000) {
-            return listOf(previousMessage.value)
+        if (!previousMessage.value.isNullOrEmpty() && System.currentTimeMillis() - previousMessageTime < 15000) {
+            return listOf(ChatboxFlags.NONTRANSPARENT.flag, previousMessage.value)
         }
         return null
     }

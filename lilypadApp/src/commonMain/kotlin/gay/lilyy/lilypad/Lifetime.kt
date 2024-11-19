@@ -9,11 +9,11 @@ import io.github.aakira.napier.Napier
 
 fun registerPreCloseListener() {
     Runtime.getRuntime().addShutdownHook(Thread {
+        CoreModules.Chatbox.clearChatbox()
         if (CoreModules.Core.config!!.logs.debug) Napier.v("Lilypad is shutting down. Saving data...")
         for (module in Modules.modules.values) {
             module.saveConfig(write = false)
         }
-        OSCSender.send(OSCMessage("/chatbox/input", listOf<Any>()))
         ConfigStorage.save()
     })
 }

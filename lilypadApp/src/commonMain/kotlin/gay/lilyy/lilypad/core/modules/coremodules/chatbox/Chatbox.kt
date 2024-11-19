@@ -19,6 +19,23 @@ import kotlinx.coroutines.withContext
 const val maxLines = 9
 const val maxChars = 144
 
+enum class ChatboxFlags(val flag: String) {
+    NONTRANSPARENT("CHATBOXFLAG_NONTRANSPARENT"),
+    TRANSPARENT("CHATBOXFLAG_TRANSPARENT");
+
+    val conflictsWith: List<ChatboxFlags>
+        get() = when (this) {
+            NONTRANSPARENT -> listOf(TRANSPARENT)
+            TRANSPARENT -> listOf(NONTRANSPARENT)
+        }
+
+    companion object {
+        fun tryFromString(string: String): ChatboxFlags? =
+            ChatboxFlags.entries.find { it.flag == string }
+    }
+}
+
+
 @Suppress("unused")
 class Chatbox : ChatboxModule<ChatboxConfig>() {
     override val name = "Chatbox"
@@ -51,7 +68,21 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
             }
         }
 
+        if (config!!.transparent) {
+            // add transparent flag to the start of outputs
+            outputs.add(0, ChatboxFlags.TRANSPARENT.flag)
+        }
+
         val lines: MutableList<String> = mutableListOf()
+
+        // Get all ChatboxFlags and remove any conflicting ones, and filter them out of the outputs
+        val flags: MutableList<ChatboxFlags> = mutableListOf()
+        for (flag in outputs.mapNotNull { ChatboxFlags.tryFromString(it)}) {
+            flags.removeAll(flag.conflictsWith)
+            flags.remove(flag)
+            flags.add(flag)
+        }
+        outputs.removeAll { ChatboxFlags.tryFromString(it) != null }
 
         for (output in outputs) {
             // You are limited to 9 lines and 144 characters total. trimByModule will not add that module to the chatbox if it pushes you over the limit. trimByLine will not add any extra lines that go over the limit, but will include the rest of the module
@@ -70,7 +101,7 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
             lines += output
         }
 
-        if (config!!.transparent && lines.isNotEmpty()) {
+            if (flags.contains(ChatboxFlags.TRANSPARENT) && lines.isNotEmpty()) {
             // if lines + transparentChars is over the limit, remove the length of transparentchars from the last line
             if (lines.sumOf { it.length } + transparentChars.length > maxChars) {
                 val lengthBefore = lines.subList(0, lines.count() - 1).sumOf { it.length }
@@ -99,7 +130,13 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
                 if (output != lastOutput || System.currentTimeMillis() - lastOutputTime > 15000) {
                     if (timeoutUp) {
                         val chatbox = output.joinToString("\n")
-                        if (CoreModules.Core.config!!.logs.outgoingChatbox) Napier.v(chatbox)
+                        if (CoreModules.Core.config!!.logs.outgoingChatbox) {
+                            if (chatbox.contains(transparentChars)) {
+                                Napier.v("Sending chatbox: $chatbox (transparent)")
+                            } else {
+                                Napier.v("Sending chatbox: $chatbox")
+                            }
+                        }
                         OSCSender.send(OSCMessage("/chatbox/input", listOf(chatbox, true, false)))
                         val scope = CoroutineScope(Dispatchers.Main)
                         scope.launch {
