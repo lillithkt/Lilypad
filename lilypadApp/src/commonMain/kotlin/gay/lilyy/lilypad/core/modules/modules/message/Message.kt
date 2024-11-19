@@ -13,7 +13,6 @@ import com.illposed.osc.OSCMessage
 import gay.lilyy.lilypad.core.CoreModules.Coremodules.chatbox.ChatboxFlags
 import gay.lilyy.lilypad.core.CoreModules.Coremodules.chatbox.ChatboxModule
 import gay.lilyy.lilypad.core.osc.OSCSender
-import gay.lilyy.lilypad.getPlatform
 import gay.lilyy.lilypad.ui.components.LText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +22,7 @@ import kotlinx.coroutines.launch
 class Message : ChatboxModule<Any>() {
     override val name = "Message"
 
-    override val disabled = getPlatform().name.contains("Android")
+//    override val disabled = getPlatform().name.contains("Android")
 
     private var previousMessage: MutableState<String?> = mutableStateOf(null)
     private var lastMessageState: MutableState<String> = mutableStateOf("")
@@ -34,14 +33,16 @@ class Message : ChatboxModule<Any>() {
     override val hasSettingsUI = true
 
     private fun sendTypingMessage() {
-        // send the current last message
-        if (lastMessageState.value.isNotEmpty())
-            OSCSender.send(OSCMessage("/chatbox/input", listOf(lastMessageState.value, true)))
-        previousMessage.value = lastMessageState.value
-        lastMessageState.value = ""
-        lastMessageTime = System.currentTimeMillis()
-        previousMessageTime = System.currentTimeMillis()
-        OSCSender.send(OSCMessage("/chatbox/typing", listOf(false)))
+        scope.launch {
+            // send the current last message
+            if (lastMessageState.value.isNotEmpty())
+                OSCSender.send(OSCMessage("/chatbox/input", listOf(lastMessageState.value, true)))
+            previousMessage.value = lastMessageState.value
+            lastMessageState.value = ""
+            lastMessageTime = System.currentTimeMillis()
+            previousMessageTime = System.currentTimeMillis()
+            OSCSender.send(OSCMessage("/chatbox/typing", listOf(false)))
+        }
     }
 
     @Composable
@@ -54,8 +55,10 @@ class Message : ChatboxModule<Any>() {
             Text("Previous Message")
             LText.Caption(previousMessage!!)
             Button(onClick = {
-                lastMessage = previousMessage!!
-                lastMessageTime = System.currentTimeMillis()
+                scope.launch {
+                    lastMessage = previousMessage!!
+                    lastMessageTime = System.currentTimeMillis()
+                }
                 sendTypingMessage()
             }) {
                 Text("Send Previous Message")
@@ -66,8 +69,10 @@ class Message : ChatboxModule<Any>() {
         TextField(
             value = lastMessage,
             onValueChange = { value ->
-                lastMessage = value.filter { it != '\n' }
-                lastMessageTime = System.currentTimeMillis()},
+                scope.launch {
+                    lastMessage = value.filter { it != '\n' }
+                    lastMessageTime = System.currentTimeMillis()
+                }},
             modifier = Modifier.onKeyEvent { keyEvent ->
                 if (listOf(KeyEventType.KeyDown, KeyEventType.KeyUp).contains(keyEvent.type) && keyEvent.key == Key.Enter) {
                     sendTypingMessage()
@@ -112,12 +117,12 @@ class Message : ChatboxModule<Any>() {
     }
     override fun buildFullChatbox(): List<String?>? {
         // FIX THIS COPILOT: Reading a state that was created after the snapshot was taken or in a snapshot that has not yet been applied
-        if (lastMessageState.value.isNotEmpty()) {
-            return listOf(ChatboxFlags.NONTRANSPARENT.flag, lastMessageState.value)
-        }
-        if (!previousMessage.value.isNullOrEmpty() && System.currentTimeMillis() - previousMessageTime < 15000) {
-            return listOf(ChatboxFlags.NONTRANSPARENT.flag, previousMessage.value)
-        }
-        return null
+            if (lastMessageState.value.isNotEmpty()) {
+                return listOf(ChatboxFlags.NONTRANSPARENT.flag, lastMessageState.value)
+            }
+            if (!previousMessage.value.isNullOrEmpty() && System.currentTimeMillis() - previousMessageTime < 15000) {
+                return listOf(ChatboxFlags.NONTRANSPARENT.flag, previousMessage.value)
+            }
+            return null
     }
 }

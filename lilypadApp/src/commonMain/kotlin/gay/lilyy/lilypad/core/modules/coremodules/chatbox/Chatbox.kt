@@ -124,8 +124,8 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
 
     private suspend fun loopBuildChatbox() {
         while (true) {
-            val output = build()
             withContext(Dispatchers.Main) {
+                val output = build()
                 // Resend again if the output hasn't changed after 15s
                 if (output != lastOutput || System.currentTimeMillis() - lastOutputTime > 15000) {
                     if (timeoutUp) {
