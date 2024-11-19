@@ -137,7 +137,7 @@ object OSCQJson {
             gs?.oscqPort?.value to "127.0.0.1"
         }
         if (port === null) {
-            if (CoreModules.Core.config!!.logs.errors) Napier.e("Failed to get node $node: OSCQuery not available")
+            if (CoreModules.Core.config!!.logs.debug) Napier.e("Failed to get node $node: OSCQuery not available")
             return null
         }
         try {

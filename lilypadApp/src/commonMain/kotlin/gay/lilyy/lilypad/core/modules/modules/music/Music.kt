@@ -80,9 +80,7 @@ class Music : ChatboxModule<MusicConfig>() {
         when (config!!.type) {
             MusicType.SPOTIFY -> {
                 output.add(
-                    "\uD83D\uDCFB ${spotifyTrack!!.name} - ${
-                        spotifyTrack!!.artists.first().name
-                    }" +
+                    "\uD83D\uDCFB ${spotifyTrack!!.name}${if (config!!.showArtist) " - " + spotifyTrack!!.artists.first().name else ""}" +
                             if (config!!.spotify.showTimestamp) {
                                 " (${sptProgressMs / 1000 / 60}:${if ((sptProgressMs / 1000 % 60) < 10) "0" else ""}${sptProgressMs / 1000 % 60} / ${spotifyTrack!!.durationMs / 1000 / 60}:${if ((spotifyTrack!!.durationMs / 1000 % 60) < 10) "0" else ""}${spotifyTrack!!.durationMs / 1000 % 60})"
                             } else {
@@ -92,7 +90,7 @@ class Music : ChatboxModule<MusicConfig>() {
             }
 
             MusicType.LASTFM -> {
-                output.add("\uD83D\uDCFB ${lastFMTrack!!.name} - ${lastFMTrack!!.artist.name}")
+                output.add("\uD83D\uDCFB ${lastFMTrack!!.name}${if (config!!.showArtist) " - " + lastFMTrack!!.artist else ""}")
             }
         }
         if (config!!.type == MusicType.SPOTIFY) {
@@ -419,6 +417,17 @@ class Music : ChatboxModule<MusicConfig>() {
             onValueChange = {
                 updateInterval = it.toIntOrNull() ?: 0
                 config!!.updateInterval = updateInterval
+                saveConfig()
+            },
+        )
+
+        var showArtist by remember { mutableStateOf(config!!.showArtist) }
+        LabeledCheckbox(
+            label = "Show Artist",
+            checked = showArtist,
+            onCheckedChange = {
+                showArtist = it
+                config!!.showArtist = it
                 saveConfig()
             },
         )

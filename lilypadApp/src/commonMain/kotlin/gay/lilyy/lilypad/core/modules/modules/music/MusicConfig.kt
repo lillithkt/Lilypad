@@ -12,6 +12,7 @@ enum class MusicType(val type: String) {
 data class MusicConfig(
     var enabled: Boolean = false,
     var updateInterval: Int = 5000,
+    var showArtist: Boolean = true,
     var type: MusicType = MusicType.SPOTIFY,
     var spotify: SpotifyConfig = SpotifyConfig(),
     var lastFM: LastFMConfig = LastFMConfig(),
