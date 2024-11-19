@@ -2,6 +2,8 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
+val version = "1.0.4"
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
@@ -81,8 +83,8 @@ android {
         applicationId = "gay.lilyy.lilypad"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0.3"
+        versionCode = version.replace(".", "").toInt()
+        versionName = version
 
         manifestPlaceholders["redirectHostName"] = "gay.lilyy.lilypad"
         manifestPlaceholders["redirectSchemeName"] = "lilypad"
@@ -117,7 +119,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Rpm)
             packageName = "gay.lilyy.lilypad"
-            packageVersion = "1.0.3"
+            packageVersion = version
 
             macOS {
                 iconFile.set(resourcesRoot.resolve("icons/icon.icns"))
