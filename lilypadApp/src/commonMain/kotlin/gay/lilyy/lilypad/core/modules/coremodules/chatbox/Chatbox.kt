@@ -71,6 +71,12 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
         }
 
         if (config!!.transparent && lines.isNotEmpty()) {
+            // if lines + transparentChars is over the limit, remove the length of transparentchars from the last line
+            if (lines.sumOf { it.length } + transparentChars.length > maxChars) {
+                val lengthBefore = lines.subList(0, lines.count() - 1).sumOf { it.length }
+
+                lines[lines.count() - 1] = lines[lines.count() - 1].substring(0, maxChars - lengthBefore - transparentChars.length - 2)// i dont know where the number 2 comes from, it only works with it
+            }
             lines[lines.count() - 1] += transparentChars
         }
 
