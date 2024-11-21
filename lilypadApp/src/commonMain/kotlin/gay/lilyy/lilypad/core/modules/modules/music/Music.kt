@@ -76,7 +76,7 @@ class Music : ChatboxModule<MusicConfig>() {
 
     override fun buildChatbox(): List<String?> {
         val output = mutableListOf<String?>()
-        if (!isPlaying) return output
+        if (!isPlaying || spotifyTrack == null) return output
         when (config!!.type) {
             MusicType.SPOTIFY -> {
                 output.add(

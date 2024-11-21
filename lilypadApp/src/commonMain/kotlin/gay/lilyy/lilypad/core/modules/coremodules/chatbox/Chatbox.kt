@@ -56,15 +56,23 @@ class Chatbox : ChatboxModule<ChatboxConfig>() {
         val outputs = mutableListOf<String>()
 
         for (module in modules) {
-            outputs += module.buildChatbox()?.filterNotNull() ?: continue
+            try {
+                outputs += module.buildChatbox()?.filterNotNull() ?: continue
+            } catch (e: Exception) {
+                Napier.e("Error building chatbox for module ${module.name}", e)
+            }
         }
 
         for (module in modules) {
-            val fullChatbox = module.buildFullChatbox()
-            if (!fullChatbox.isNullOrEmpty() && fullChatbox.any { it != null }) {
-                outputs.clear()
-                outputs += fullChatbox.filterNotNull()
-                break
+            try {
+                val fullChatbox = module.buildFullChatbox()
+                if (!fullChatbox.isNullOrEmpty() && fullChatbox.any { it != null }) {
+                    outputs.clear()
+                    outputs += fullChatbox.filterNotNull()
+                    break
+                }
+            } catch (e: Exception) {
+                Napier.e("Error building full chatbox for module ${module.name}", e)
             }
         }
 
